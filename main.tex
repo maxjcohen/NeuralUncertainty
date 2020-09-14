@@ -13,4 +13,28 @@
 \author{Max Cohen}
 \maketitle
 
+% \chapter{Notations}
+% We consider a the prediction of hidden state $(x^1, \cdots x^T)$ given a set of observations $(y^1, \cdots y^T)$.
+
+\chapter{Model definition}
+We define a $L$ layer RNN followed by a fully connected layer. At time step $t$,
+
+$$
+    \left\{
+    \begin{array}{ll}
+        x_{t+1} = tanh(W_x h_{t+1}^L + b_x) + \epsilon_t                                                             \\
+        h_{t+1}^l = tanh(W_{hy}^l h^{l-1}_{t+1} + W_{hh}^l h^{l}_{t} + b_h^l) + \eta_t \quad \forall 1 \leq l \leq L \\
+    \end{array}
+    \right.
+$$
+and $h_{t}^0 \equiv y_{t}$.
+
+Let's consider the weights of the last RNN layer as $\Theta^L \equiv (W_{hy}^L, W_{hh}^L, b_h^L)$, we have
+$h_{t+1}^L = f_{\Theta^L}(h_{t+1}^{L-1}, h_{t}^L) + \eta_t$.
+
+\begin{align}
+    Q(\hat \Theta^L_p, \Theta^L) & = \mathop{\mathbb{E}_{\hat \Theta^L_p}} \left[ log \; p_{\Theta^L}(X_{1:T}, h_{1:T}, y_{1:T} | X_{1:T}) \right] \\
+                                 & \simeq \frac{1}{M} \sum_{i=1}^M  log \; p_{\Theta^L}(X_{1:T}, h_{1:T}, y_{1:T})
+\end{align}
+
 \end{document}
