@@ -12,7 +12,6 @@
 \title{Neural Uncertainty}
 \author{Max Cohen}
 \maketitle
-
 % \chapter{Notations}
 % We consider a the prediction of hidden state $(x^1, \cdots x^T)$ given a set of observations $(y^1, \cdots y^T)$.
 
@@ -36,5 +35,4 @@ $h_{t+1}^L = f_{\Theta^L}(h_{t+1}^{L-1}, h_{t}^L) + \eta_t$.
     Q(\hat \Theta^L_p, \Theta^L) & = \mathop{\mathbb{E}_{\hat \Theta^L_p}} \left[ log \; p_{\Theta^L}(X_{1:T}, h_{1:T}, y_{1:T} | X_{1:T}) \right] \\
                                  & \simeq \frac{1}{M} \sum_{i=1}^M  log \; p_{\Theta^L}(X_{1:T}, h_{1:T}, y_{1:T})
 \end{align}
-
 \end{document}
