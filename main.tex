@@ -36,8 +36,8 @@ Let's consider the weights of the last RNN and fully connected layers as $\Theta
 \begin{equation}
     \left\{
     \begin{aligned}
-        x_{t+1} & = f_\Theta(h_t) + \epsilon_t  & \text{observation model} \\
-        h_{t+1} & = g_\Theta(h_t, y_t) + \eta_t & \text{state model}       \\
+        x_{t+1} & = f_\Theta(h_t) + \epsilon_t      & \text{observation model} \\
+        h_{t+1} & = g_\Theta(h_t, y_{t+1}) + \eta_t & \text{state model}       \\
     \end{aligned}
     \right.
 \end{equation}
