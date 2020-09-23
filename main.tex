@@ -43,7 +43,14 @@ Let's consider the weights of the last RNN and fully connected layers as $\Theta
 \end{equation}
 
 \begin{align*}
-    Q(\hat \Theta_p, \Theta) & = \mathop{\mathbb{E}_{\hat \Theta_p}} \left[ \log \; p_{\Theta}(X_{1:T}, h_{1:T}, y_{1:T}) | X_{1:T} \right] \\
-                             & \simeq \frac{1}{M} \sum_{i=1}^M  log \; p_{\Theta}(X_{1:T}, h_{1:T}, y_{1:T})
+    Q(\hat \Theta_p, \Theta) & = \mathop{\mathbb{E}_{\hat \Theta_p}} \left[ \log \; p_{\Theta}(X_{1:T}, h_{1:T}, y_{1:T}) | X_{1:T} \right]                                                          \\
+                             & \simeq \frac{1}{T} \sum_{i=1}^T  log \; p_{\Theta}(X_{1:T}, h_{1:T}, y_{1:T})                                                                                         \\
+                             & = \frac{1}{T} \log\left(\prod_{k=1}^{T} p_{\Theta}(h_k | h_{k-1}, y_k) p_{\Theta}(x_k | h_k)\right)                                                                   \\
+                             & = \frac{1}{T} \sum_{k=1}^{T} \log \; p_{\Theta}(h_k | h_{k-1}, y_k) + \log \; p_{\Theta}(x_k | h_k)                                                                   \\
+                             & = \frac{1}{T} \sum_{k=1}^{T} \log \left[det(2\pi\Sigma_h)^{-1/2} \exp(-\frac{1}{2}(h_k - g_\Theta(h_{k-1}, y_{k}))^T \Sigma_h (h_k - g_\Theta(h_{k-1}, y_{k}))\right] \\
+                             & + \log \left[det(2\pi\Sigma_x)^{-1/2} \exp(-\frac{1}{2}(x_k - f_\Theta(h_k))^T \Sigma_h (x_k - f_\Theta(h_k))\right]                                                  \\
+                             & = -\frac{1}{2} log |\Sigma_h| -\frac{1}{2} log |\Sigma_x|                                                                                                             \\
+                             & - \frac{1}{2T} \sum_{k=1}^{T}(h_k - g_\Theta(h_{k-1}, y_{k}))^T \Sigma_h (h_k - g_\Theta(h_{k-1}, y_{k}))                                                             \\
+                             & - \frac{1}{2T} \sum_{k=1}^{T}(x_k - f_\Theta(h_k))^T \Sigma_x (x_k - f_\Theta(h_k))                                                                                   \\
 \end{align*}
 \end{document}
