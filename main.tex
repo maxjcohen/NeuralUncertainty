@@ -57,4 +57,15 @@ Let's develop the interior of the expectation:
                                           & - \frac{1}{2T} \sum_{k=1}^{T}(x_k - g_\Theta(x_{k-1}, u_{k}))^T \Sigma_x^{-1} (x_k - g_\Theta(x_{k-1}, u_{k}))                                                              \\
                                           & - \frac{1}{2T} \sum_{k=1}^{T}(y_k - f_\Theta(x_k))^T \Sigma_y^{-1} (y_k - f_\Theta(x_k))                                                                                    \\
 \end{align*}
+
+In order to find the minimal value of $\Sigma_x$, we can search for the zeros of the derivate of the concave function $\Sigma_x \mapsto p_{\Theta}(X_{1:T}, y_{1:T}, u_{1:T})$.
+
+\begin{align*}
+    \frac{\partial p_{\Theta}(X_{1:T}, y_{1:T}, u_{1:T})}{\partial \Sigma_x^{-1}} & = \frac{1}{2} \Sigma_x - \frac{1}{2T} \sum_{k=1}^T 2 \Sigma_x^{-1} (x_k - f_{\Theta}(x_{k-1}, u_k)) \\
+                                                                                  & = \frac{1}{2} \Sigma_x - \frac{\Sigma_x^{-1}}{T} \sum_{k=1}^T x_k - f_{\Theta}(x_{k-1}, u_k)
+\end{align*}
+
+\begin{align*}
+    \frac{\partial p_{\Theta}(X_{1:T}, y_{1:T}, u_{1:T})}{\partial \Sigma_x^{-1}} = 0 \implies diag(\Sigma_x) = \sum_{k=1}^T x_k - f_{\Theta}(x_{k-1}, u_k)
+\end{align*}
 \end{document}
