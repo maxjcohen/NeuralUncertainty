@@ -1,4 +1,4 @@
-\documentclass[11pt,a4paper]{report}
+\documentclass[10pt,a4paper]{report}
 
 \usepackage{amsfonts}
 \usepackage{amsmath}
@@ -36,7 +36,7 @@ Let's consider the weights of the last RNN and fully connected layers as $\Theta
 \begin{equation}
     \left\{
     \begin{aligned}
-        x_{t+1} & = f_\Theta(y_{t+1}) + \epsilon_{t+1}      & \text{observation model} \\
+        x_{t+1} & = f_\Theta(y_{t+1}) + \epsilon_{t+1}    & \text{observation model} \\
         y_{t+1} & = g_\Theta(y_{t}, u_{t+1}) + \eta_{t+1} & \text{state model}       \\
     \end{aligned}
     \right.
@@ -49,12 +49,12 @@ Let's consider the weights of the last RNN and fully connected layers as $\Theta
 Let's develop the interior of expectation:
 
 \begin{align*}
-p_{\Theta}(X_{1:T}, y_{1:T}, u_{1:T}) & = \frac{1}{T} \log\left(\prod_{k=1}^{T} p_{\Theta}(y_k | y_{k-1}, u_k) p_{\Theta}(x_k | y_k)\right)                                                                \\
-                             & = \frac{1}{T} \sum_{k=1}^{T} \log \; p_{\Theta}(y_k | y_{k-1}, u_k) + \log \; p_{\Theta}(x_k | y_k)                                                                  \\
-                             & = \frac{1}{T} \sum_{k=1}^{T} \log \left(\det(2\pi\Sigma_y)^{-1/2} \exp(-\frac{1}{2}(y_k - g_\Theta(y_{k-1}, u_{k}))^T \Sigma_y^{-1} (y_k - g_\Theta(y_{k-1}, u_{k}))\right) \\
-                             & + \log \left(det(2\pi\Sigma_x)^{-1/2} \exp(-\frac{1}{2}(x_k - f_\Theta(y_k))^T \Sigma_x^{-1} (x_k - f_\Theta(y_k))\right)                                                  \\
-                             & = -\frac{1}{2} log |\Sigma_y| -\frac{1}{2} log |\Sigma_x|                                                                                                          \\
-                             & - \frac{1}{2T} \sum_{k=1}^{T}(y_k - g_\Theta(y_{k-1}, u_{k}))^T \Sigma_y^{-1} (y_k - g_\Theta(y_{k-1}, u_{k}))                                                             \\
-                             & - \frac{1}{2T} \sum_{k=1}^{T}(x_k - f_\Theta(y_k))^T \Sigma_x^{-1} (x_k - f_\Theta(y_k))                                                                                \\
+    p_{\Theta}(X_{1:T}, y_{1:T}, u_{1:T}) & = \frac{1}{T} \log\left(\prod_{k=1}^{T} p_{\Theta}(y_k | y_{k-1}, u_k) p_{\Theta}(x_k | y_k)\right)                                                                         \\
+                                          & = \frac{1}{T} \sum_{k=1}^{T} \log \; p_{\Theta}(y_k | y_{k-1}, u_k) + \log \; p_{\Theta}(x_k | y_k)                                                                         \\
+                                          & = \frac{1}{T} \sum_{k=1}^{T} \log \left(\det(2\pi\Sigma_y)^{-1/2} \exp(-\frac{1}{2}(y_k - g_\Theta(y_{k-1}, u_{k}))^T \Sigma_y^{-1} (y_k - g_\Theta(y_{k-1}, u_{k}))\right) \\
+                                          & + \log \left(det(2\pi\Sigma_x)^{-1/2} \exp(-\frac{1}{2}(x_k - f_\Theta(y_k))^T \Sigma_x^{-1} (x_k - f_\Theta(y_k))\right)                                                   \\
+                                          & = -\frac{1}{2} log |\Sigma_y| -\frac{1}{2} log |\Sigma_x|                                                                                                                   \\
+                                          & - \frac{1}{2T} \sum_{k=1}^{T}(y_k - g_\Theta(y_{k-1}, u_{k}))^T \Sigma_y^{-1} (y_k - g_\Theta(y_{k-1}, u_{k}))                                                              \\
+                                          & - \frac{1}{2T} \sum_{k=1}^{T}(x_k - f_\Theta(y_k))^T \Sigma_x^{-1} (x_k - f_\Theta(y_k))                                                                                    \\
 \end{align*}
 \end{document}
