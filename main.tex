@@ -15,7 +15,7 @@
 
 \chapter{Model definition}
 \section{Notations}
-We consider the prediction task of a set of observations $(x^1, \cdots x^T)$ given a set of input $(u^1, \cdots u^T)$.
+We consider the prediction task of a set of observations $(y^1, \cdots y^T)$ given a set of input $(u^1, \cdots u^T)$.
 
 \section{Model}
 We define a $L$ layer RNN followed by a fully connected layer. At time step $t$,
@@ -23,21 +23,21 @@ We define a $L$ layer RNN followed by a fully connected layer. At time step $t$,
 \begin{equation*}
     \left\{
     \begin{aligned}
-        x_{t+1}   & = \tanh(W_x y_{t+1}^L + b_x)                                                               \\
-        y_{t+1}^l & = \tanh(W_{yu}^l y^{l-1}_{t+1} + W_{yy}^l y^{l}_{t} + b_y^l) \quad \forall 1 \leq l \leq L \\
+        y_{t+1}   & = \tanh(W_y x_{t+1}^L + b_y)                                                               \\
+        x_{t+1}^l & = \tanh(W_{xx}^l x^{l}_{t} + W_{xu}^l x^{l-1}_{t+1} + b_x^l) \quad \forall 1 \leq l \leq L \\
     \end{aligned}
     \right.
 \end{equation*}
 
-with $y_{t}^0 \equiv u_{t} \; \forall t$ and $y_{0}^l \equiv 0 \; \forall 1 \leq l \leq L$ .
+with $x_{t}^0 \equiv u_{t} \; \forall t$ and $x_{0}^l \equiv 0 \; \forall 1 \leq l \leq L$ .
 
-Let's consider the weights of the last RNN and fully connected layers as $\Theta \equiv (W_{yu}^L, W_{yy}^L, b_y^L, W_x, b_x)$. We can define a new matrix $y_t$ at each time step corresponding to the concatenation of all RNN layers: $y_t \equiv (y_t^1 \cdots y_t^L)$. We also introduce two sequences of random noises as i.i.d real valued random variables $\epsilon$ and $\eta$. We can now write our model in terms of two functions $f$ and $g$ as:
+Let's consider the weights of the last RNN and fully connected layers as $\Theta \equiv (W_{xx}^L, W_{xu}^L, b_x^L, W_y, b_y)$. We can define a new matrix $y_t$ at each time step corresponding to the concatenation of all RNN layers: $x_t \equiv (x_t^1 \cdots x_t^L)$. We also introduce two sequences of random noises as i.i.d real valued random variables $\epsilon$ and $\eta$. We can now write our model in terms of two functions $f$ and $g$ as:
 
 \begin{equation}
     \left\{
     \begin{aligned}
-        x_{t+1} & = f_\Theta(y_{t+1}) + \epsilon_{t+1}    & \text{observation model} \\
-        y_{t+1} & = g_\Theta(y_{t}, u_{t+1}) + \eta_{t+1} & \text{state model}       \\
+        y_{t+1} & = f_\Theta(x_{t+1}) + \epsilon_{t+1}    & \text{observation model} \\
+        x_{t+1} & = g_\Theta(x_{t}, u_{t+1}) + \eta_{t+1} & \text{state model}       \\
     \end{aligned}
     \right.
 \end{equation}
@@ -46,15 +46,15 @@ Let's consider the weights of the last RNN and fully connected layers as $\Theta
     Q(\hat \Theta_p, \Theta) & = \mathop{\mathbb{E}_{\hat \Theta_p}} \left[ \log \; p_{\Theta}(X_{1:T}, y_{1:T}, u_{1:T}) | y_{1:T} \right]
 \end{align}
 
-Let's develop the interior of expectation:
+Let's develop the interior of the expectation:
 
 \begin{align*}
-    p_{\Theta}(X_{1:T}, y_{1:T}, u_{1:T}) & = \frac{1}{T} \log\left(\prod_{k=1}^{T} p_{\Theta}(y_k | y_{k-1}, u_k) p_{\Theta}(x_k | y_k)\right)                                                                         \\
-                                          & = \frac{1}{T} \sum_{k=1}^{T} \log \; p_{\Theta}(y_k | y_{k-1}, u_k) + \log \; p_{\Theta}(x_k | y_k)                                                                         \\
-                                          & = \frac{1}{T} \sum_{k=1}^{T} \log \left(\det(2\pi\Sigma_y)^{-1/2} \exp(-\frac{1}{2}(y_k - g_\Theta(y_{k-1}, u_{k}))^T \Sigma_y^{-1} (y_k - g_\Theta(y_{k-1}, u_{k}))\right) \\
-                                          & + \log \left(det(2\pi\Sigma_x)^{-1/2} \exp(-\frac{1}{2}(x_k - f_\Theta(y_k))^T \Sigma_x^{-1} (x_k - f_\Theta(y_k))\right)                                                   \\
-                                          & = -\frac{1}{2} log |\Sigma_y| -\frac{1}{2} log |\Sigma_x|                                                                                                                   \\
-                                          & - \frac{1}{2T} \sum_{k=1}^{T}(y_k - g_\Theta(y_{k-1}, u_{k}))^T \Sigma_y^{-1} (y_k - g_\Theta(y_{k-1}, u_{k}))                                                              \\
-                                          & - \frac{1}{2T} \sum_{k=1}^{T}(x_k - f_\Theta(y_k))^T \Sigma_x^{-1} (x_k - f_\Theta(y_k))                                                                                    \\
+    p_{\Theta}(X_{1:T}, y_{1:T}, u_{1:T}) & = \frac{1}{T} \log\left(\prod_{k=1}^{T} p_{\Theta}(x_k | x_{k-1}, u_k) p_{\Theta}(y_k | x_k)\right)                                                                         \\
+                                          & = \frac{1}{T} \sum_{k=1}^{T} \log \; p_{\Theta}(x_k | x_{k-1}, u_k) + \log \; p_{\Theta}(y_k | x_k)                                                                         \\
+                                          & = \frac{1}{T} \sum_{k=1}^{T} \log \left(\det(2\pi\Sigma_x)^{-1/2} \exp(-\frac{1}{2}(x_k - g_\Theta(x_{k-1}, u_{k}))^T \Sigma_x^{-1} (x_k - g_\Theta(x_{k-1}, u_{k}))\right) \\
+                                          & + \log \left(det(2\pi\Sigma_y)^{-1/2} \exp(-\frac{1}{2}(y_k - f_\Theta(x_k))^T \Sigma_y^{-1} (y_k - f_\Theta(x_k))\right)                                                   \\
+                                          & = -\frac{1}{2} \log|\Sigma_x| -\frac{1}{2} \log|\Sigma_y|                                                                                                                   \\
+                                          & - \frac{1}{2T} \sum_{k=1}^{T}(x_k - g_\Theta(x_{k-1}, u_{k}))^T \Sigma_x^{-1} (x_k - g_\Theta(x_{k-1}, u_{k}))                                                              \\
+                                          & - \frac{1}{2T} \sum_{k=1}^{T}(y_k - f_\Theta(x_k))^T \Sigma_y^{-1} (y_k - f_\Theta(x_k))                                                                                    \\
 \end{align*}
 \end{document}
