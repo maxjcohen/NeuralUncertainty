@@ -30,20 +30,20 @@ We define a $L$ layer RNN followed by a fully connected layer. At time step $t$,
 
 with $x_{t}^0 \equiv u_{t} \; \forall t$ and $x_{0}^l \equiv 0 \; \forall 1 \leq l \leq L$ .
 
-Let's consider the weights of the last RNN and fully connected layers as $\Theta \equiv (W_{xx}^L, W_{xu}^L, b_x^L, W_y, b_y)$. We can define a new matrix $y_t$ at each time step corresponding to the concatenation of all RNN layers: $x_t \equiv (x_t^1 \cdots x_t^L)$. We also introduce two sequences of random noises as i.i.d real valued random variables $\epsilon$ and $\eta$. We can now write our model in terms of two functions $f$ and $g$ as:
+Let's consider the weights of the last RNN and fully connected layers as $\theta \equiv (W_{xx}^L, W_{xu}^L, b_x^L, W_y, b_y)$. We can define a new matrix $y_t$ at each time step corresponding to the concatenation of all RNN layers: $x_t \equiv (x_t^1 \cdots x_t^L)$. We also introduce two sequences of random noises as i.i.d real valued random variables $\epsilon$ and $\eta$. We can now write our model in terms of two functions $f$ and $g$ as:
 
 \begin{equation}
     \left\{
     \begin{aligned}
-        y_{t+1} & = f_\Theta(x_{t+1}) + \epsilon_{t+1}    & \text{observation model} \\
-        x_{t+1} & = g_\Theta(x_{t}, u_{t+1}) + \eta_{t+1} & \text{state model}       \\
+        y_{t+1} & = f_\theta(x_{t+1}) + \epsilon_{t+1}    & \text{observation model} \\
+        x_{t+1} & = g_\theta(x_{t}, u_{t+1}) + \eta_{t+1} & \text{state model}       \\
     \end{aligned}
     \right.
 \end{equation}
 
 In the following section, we will focus on minimizing the log likelihood
 \begin{align}
-    \log \; p_{\Theta}(X_{1:T}, y_{1:T}, u_{1:T})
+    \log \; p_{\theta}(X_{1:T}, y_{1:T}, u_{1:T})
     \label{log_likelihood}
 \end{align}
 
@@ -51,55 +51,55 @@ In the following section, we will focus on minimizing the log likelihood
 
 In order to minimize \ref{log_likelihood}, we apply an EM strategy. Let
 \begin{align}
-    Q(\hat \Theta_p, \Theta) & = \mathop{\mathbb{E}_{\hat \Theta_p}} \left[ \log \; p_{\Theta}(X_{1:T}, y_{1:T}, u_{1:T}) | y_{1:T} \right]
+    Q(\hat \theta_p, \theta) & = \mathop{\mathbb{E}_{\hat \theta_p}} \left[ \log \; p_{\theta}(X_{1:T}, y_{1:T}, u_{1:T}) | y_{1:T} \right]
 \end{align}
 
 We can start by developing the log likelihood:
 
 \begin{align*}
-    \log p_{\Theta}(X_{1:T}, y_{1:T}, u_{1:T}) & = \frac{1}{T} \log\left(\prod_{k=1}^{T} p_{\Theta}(x_k | x_{k-1}, u_k) p_{\Theta}(y_k | x_k)\right)                                                                         \\
-                                               & = \frac{1}{T} \sum_{k=1}^{T} \log \; p_{\Theta}(x_k | x_{k-1}, u_k) + \log \; p_{\Theta}(y_k | x_k)                                                                         \\
-                                               & = \frac{1}{T} \sum_{k=1}^{T} \log \left(\det(2\pi\Sigma_x)^{-1/2} \exp(-\frac{1}{2}(x_k - g_\Theta(x_{k-1}, u_{k}))^T \Sigma_x^{-1} (x_k - g_\Theta(x_{k-1}, u_{k}))\right) \\
-                                               & + \log \left(det(2\pi\Sigma_y)^{-1/2} \exp(-\frac{1}{2}(y_k - f_\Theta(x_k))^T \Sigma_y^{-1} (y_k - f_\Theta(x_k))\right)                                                   \\
+    \log p_{\theta}(X_{1:T}, y_{1:T}, u_{1:T}) & = \frac{1}{T} \log\left(\prod_{k=1}^{T} p_{\theta}(x_k | x_{k-1}, u_k) p_{\theta}(y_k | x_k)\right)                                                                         \\
+                                               & = \frac{1}{T} \sum_{k=1}^{T} \log \; p_{\theta}(x_k | x_{k-1}, u_k) + \log \; p_{\theta}(y_k | x_k)                                                                         \\
+                                               & = \frac{1}{T} \sum_{k=1}^{T} \log \left(\det(2\pi\Sigma_x)^{-1/2} \exp(-\frac{1}{2}(x_k - g_\theta(x_{k-1}, u_{k}))^T \Sigma_x^{-1} (x_k - g_\theta(x_{k-1}, u_{k}))\right) \\
+                                               & + \log \left(det(2\pi\Sigma_y)^{-1/2} \exp(-\frac{1}{2}(y_k - f_\theta(x_k))^T \Sigma_y^{-1} (y_k - f_\theta(x_k))\right)                                                   \\
                                                & = -\frac{1}{2} \log|\Sigma_x| -\frac{1}{2} \log|\Sigma_y|                                                                                                                   \\
-                                               & - \frac{1}{2T} \sum_{k=1}^{T}(x_k - g_\Theta(x_{k-1}, u_{k}))^T \Sigma_x^{-1} (x_k - g_\Theta(x_{k-1}, u_{k}))                                                              \\
-                                               & - \frac{1}{2T} \sum_{k=1}^{T}(y_k - f_\Theta(x_k))^T \Sigma_y^{-1} (y_k - f_\Theta(x_k))                                                                                    \\
+                                               & - \frac{1}{2T} \sum_{k=1}^{T}(x_k - g_\theta(x_{k-1}, u_{k}))^T \Sigma_x^{-1} (x_k - g_\theta(x_{k-1}, u_{k}))                                                              \\
+                                               & - \frac{1}{2T} \sum_{k=1}^{T}(y_k - f_\theta(x_k))^T \Sigma_y^{-1} (y_k - f_\theta(x_k))                                                                                    \\
 \end{align*}
 
-We will jointly update $\Sigma_x$, $\Sigma_y$ and $\Theta$ iteratively. We can start by computing the explicit form of the minimum of both covariance matrices.
+We will jointly update $\Sigma_x$, $\Sigma_y$ and $\theta$ iteratively. We can start by computing the explicit form of the minimum of both covariance matrices.
 
-For $\Sigma_y$, we search the zeros of the derivate of the convex function $\Sigma_y \mapsto p_{\Theta}(X_{1:T}, y_{1:T}, u_{1:T})$.
+For $\Sigma_y$, we search the zeros of the derivate of the convex function $\Sigma_y \mapsto p_{\theta}(X_{1:T}, y_{1:T}, u_{1:T})$.
 
 \begin{align*}
-    \frac{\partial p_{\Theta}(X_{1:T}, y_{1:T}, u_{1:T})}{\partial \Sigma_y^{-1}} & = \frac{1}{2} \Sigma_y - \frac{1}{2T} \sum_{k=1}^T (x_k - f_{\Theta}(x_{k})) \cdot (x_k - f_{\Theta}(x_{k}))'
+    \frac{\partial p_{\theta}(X_{1:T}, y_{1:T}, u_{1:T})}{\partial \Sigma_y^{-1}} & = \frac{1}{2} \Sigma_y - \frac{1}{2T} \sum_{k=1}^T (x_k - f_{\theta}(x_{k})) \cdot (x_k - f_{\theta}(x_{k}))'
 \end{align*}
 
 \begin{align*}
-    \frac{\partial p_{\Theta}(X_{1:T}, y_{1:T}, u_{1:T})}{\partial \Sigma_y^{-1}} = 0 & \implies \Sigma_y = \frac{1}{T}\sum_{k=1}^T (y_k - f_{\Theta}(x_k))(y_k - f_{\Theta}(x_k))'                   \\
-    \frac{\partial p_{\Theta}(X_{1:T}, y_{1:T}, u_{1:T})}{\partial \Sigma_x^{-1}} = 0 & \implies \Sigma_x = \frac{1}{T}\sum_{k=1}^T (x_k - g_{\Theta}(x_{k-1}, u_k))(x_k - g_{\Theta}(x_{k-1}, u_k))'
+    \frac{\partial p_{\theta}(X_{1:T}, y_{1:T}, u_{1:T})}{\partial \Sigma_y^{-1}} = 0 & \implies \Sigma_y = \frac{1}{T}\sum_{k=1}^T (y_k - f_{\theta}(x_k))(y_k - f_{\theta}(x_k))'                   \\
+    \frac{\partial p_{\theta}(X_{1:T}, y_{1:T}, u_{1:T})}{\partial \Sigma_x^{-1}} = 0 & \implies \Sigma_x = \frac{1}{T}\sum_{k=1}^T (x_k - g_{\theta}(x_{k-1}, u_k))(x_k - g_{\theta}(x_{k-1}, u_k))'
 \end{align*}
 
-Since we can't compute an explicit form for $\Theta$, we will compute the $\argmin$ using a gradient descent. The EM algorithm develops is as follows:
+Since we can't compute an explicit form for $\theta$, we will compute the $\argmin$ using a gradient descent. The EM algorithm develops is as follows:
 
 \begin{align*}
-    \Sigma_{y, p+1} & = \frac{1}{T}\sum_{k=1}^T \mathbb{E}_{\hat \Theta_p} \left[ (y_k - f_{\Theta}(x_k))(y_k - f_{\Theta}(x_k))' | y_{1:T} \right]                                 \\
-    \Sigma_{x, p+1} & = \frac{1}{T}\sum_{k=1}^T \mathbb{E}_{\hat \Theta_p} \left[ (x_k - g_{\Theta}(x_{k-1}, u_k))(x_k - g_{\Theta}(x_{k-1}, u_k))' | y_{1:T} \right]               \\
-    \Theta_{p+1}    & = \argmin_{\Theta} \frac{1}{T}\sum_{k=1}^T \mathbb{E}_{\hat \Theta_p} \left[ (y_k - f_{\Theta}(x_k))' \Sigma_{y, p} (y_k - f_{\Theta}(x_k)) | y_{1:T} \right]
+    \Sigma_{y, p+1} & = \frac{1}{T}\sum_{k=1}^T \mathbb{E}_{\hat \theta_p} \left[ (y_k - f_{\theta}(x_k))(y_k - f_{\theta}(x_k))' | y_{1:T} \right]                                 \\
+    \Sigma_{x, p+1} & = \frac{1}{T}\sum_{k=1}^T \mathbb{E}_{\hat \theta_p} \left[ (x_k - g_{\theta}(x_{k-1}, u_k))(x_k - g_{\theta}(x_{k-1}, u_k))' | y_{1:T} \right]               \\
+    \theta_{p+1}    & = \argmin_{\theta} \frac{1}{T}\sum_{k=1}^T \mathbb{E}_{\hat \theta_p} \left[ (y_k - f_{\theta}(x_k))' \Sigma_{y, p} (y_k - f_{\theta}(x_k)) | y_{1:T} \right]
 \end{align*}
 
 \section{Sequential Monte Carlo Approach}
 We approximate the expectation conditional to the observations by using a particle filter. Let $M$ be the number of particles, $\xi_k^m$ and $\omega_k^m$ the $m$-th particle associated to it's weight for time step $k$.
 \begin{align*}
-    \Phi_k^M & = \mathbb{E}_{\hat \Theta_p} \left[ (y_k - f_{\Theta}(x_k))(y_k - f_{\Theta}(x_k))' | y_{1:T} \right]  \\
-             & = \frac{1}{\Omega_k^M} \sum_{m=1}^M \omega_k^m (y_k - f_{\Theta}(\xi_k^m))(y_k - f_{\Theta}(\xi_k^m))'
+    \Phi_k^M & = \mathbb{E}_{\hat \theta_p} \left[ (y_k - f_{\theta}(x_k))(y_k - f_{\theta}(x_k))' | y_{1:T} \right]  \\
+             & = \frac{1}{\Omega_k^M} \sum_{m=1}^M \omega_k^m (y_k - f_{\theta}(\xi_k^m))(y_k - f_{\theta}(\xi_k^m))'
 \end{align*}
 where $\Omega_k^M = \sum_{m=1}^M \omega_k^m$. In the following sections, we consider that the particles weights sum at 1.
 
 \section{Gradient descent}
-At each iteration of the EM algorithm, we start by generating a set of particles under the law $p(x|y)$, that allows us to compute a explicit value for the expectation. We can then minimize this expectation, in order to approximate the new $\Theta$ candidate, using a gradient descent.
+At each iteration of the EM algorithm, we start by generating a set of particles under the law $p(x|y)$, that allows us to compute a explicit value for the expectation. We can then minimize this expectation, in order to approximate the new $\theta$ candidate, using a gradient descent.
 
 $$
-    \Theta_{p+1} = \argmin_{\Theta} \frac{1}{T}\sum_{k=1}^T \sum_{m=1}^M (y_k - f_{\Theta}(\omega_k^m))' \Sigma_{y, p} (y_k - f_{\Theta}(\omega_k^m))
+    \theta_{p+1} = \argmin_{\theta} \frac{1}{T}\sum_{k=1}^T \sum_{m=1}^M (y_k - f_{\theta}(\omega_k^m))' \Sigma_{y, p} (y_k - f_{\theta}(\omega_k^m))
 $$
 
 \end{document}
