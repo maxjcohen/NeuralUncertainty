@@ -94,12 +94,25 @@ We now have an expression for minimizing both $\Sigma$ matrices given a value of
 
 
 \section{Sequential Monte Carlo Approach}
-We approximate the expectation conditional to the observations by using a particle filter. We sample $M$ trajectories $\xi_{1:T}^m$ associated with the weight $\omega_T^m$. At each time step $k$, we have:
+In order to compute the conditional expectations in the previous expressions, we will sample trajectories $\xi_{1:T}^m$ associated with the weights $\omega_T^m$ with respect to the density $p_{\theta}(x | y)$, using a sequential Monte Carlo particle filter.
+
+We sample particles iteratively. At time step $k=0$, $(\xi_0^l)_{l=1}^N$ are sampled independently from the instrumental density $\rho_0$ and each particle is associated with the standard importance sampling weight:
+$$\omega_0^l=\chi(\xi_0^l) g_0(\xi_0^l) / \rho_0(\xi_0^l)$$
+
+At time $k$, we choose to propagate the previous particle ($\xi_{k-1}^l$) with density:
+$$\pi_k(l, x) \propto \omega_{k-1}^l \nu(\xi_{k-1}^l) p_k(\xi_{k-1}^l, x) $$
+
+Particles are associated with weights:
+$$\omega_k^l = \frac{q(\xi_{k-1}^{I_k^l}, \xi_k^l)}{p_k(\xi_{k-1}^{I_k^l}, \xi_k^l)} \frac{g_k(\xi_k^l)}{\nu_k(\xi_{k-1}^{I_k^l})}$$
+
+Using the poor man filter, we get $N$ trajectories:
+$$\xi_{0:k+1}^{l} = (\xi_{0:k}^{I_{k+1}^l}, \xi_{k+1}^l)$$
+
+We can now approximate this conditional expectation for any measurable bounded function $h$:
 \begin{align*}
     \Phi_k^M[h] & = \mathbb{E}_{\hat \mu_p} \left[ h(x_k) | y_{1:T} \right] \\
-                & = \frac{1}{\Omega_T^M} \sum_{m=1}^M \omega_T^m h(\xi_k^m)
+                & = \sum_{l=1}^N \omega_T^l h(\xi_{0:T}^l)
 \end{align*}
-For all $h$ measurable bounded, where $\Omega_T^M = \sum_{m=1}^M \omega_T^m$. In the following sections, we consider that the particles weights sum at 1.
 
 \section{Gradient descent}
 At each iteration of the EM algorithm, we start by generating a set of particles under the law $p(x|y)$, that allows us to compute a explicit value for the expectation. We can then minimize this expectation, in order to approximate the new $\theta$ candidate, using a gradient descent.
