@@ -121,7 +121,7 @@ We can now approximate this conditional expectation for any measurable bounded f
 At each iteration of the EM algorithm, we start by generating a set of particles under the law $p(x|y)$, that allows us to compute a explicit value for the expectation. We can then minimize this expectation, in order to approximate the new $\theta$ candidate, using a gradient descent.
 
 \begin{align*}
-    \theta_{p+1} & = \argmin_{\theta} \frac{1}{T}\sum_{k=1}^T \sum_{m=1}^M \omega_T^m (y_k - f_{\theta_p}(\xi_k^m))' \Sigma_{y, p+1}^{-1} (y_k - f_{\theta_p}(\omega_k^m)) \\
+    \theta_{p+1} & = \argmin_{\theta} \frac{1}{T}\sum_{k=1}^T \sum_{m=1}^M \omega_T^m (y_k - f_{\theta_p}(\xi_k^m))' \Sigma_{y, p+1}^{-1} (y_k - f_{\theta_p}(\xi_k^m)) \\
                  & + \omega_T^m (\xi_k^m - g_{\theta_p}(\xi_{k-1}^m, u_k)'\Sigma_{x, p+1}^{-1}(\xi_k^m - g_{\theta_p}(\xi_{k-1}^m, u_k))
 \end{align*}
 
