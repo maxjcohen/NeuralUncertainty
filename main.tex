@@ -30,7 +30,7 @@ We define a $L$ layer RNN followed by a fully connected layer. At time step $t$,
 
 with $x_{t}^0 \equiv u_{t} \; \forall t$ and $x_{0}^l \equiv 0 \; \forall 1 \leq l \leq L$ .
 
-Let's consider the weights of the last RNN and fully connected layers as $\theta \equiv (W_{xx}^L, W_{xu}^L, b_x^L, W_y, b_y)$. We can define a new matrix $y_t$ at each time step corresponding to the concatenation of all RNN layers: $x_t \equiv (x_t^1 \cdots x_t^L)$. We also introduce two sequences of random noises as i.i.d real valued random variables $\epsilon$ and $\eta$. We can now write our model in terms of two functions $f$ and $g$ as:
+Let's consider the weights of the last RNN and fully connected layers as $\theta \equiv (W_{xx}^L, W_{xu}^L, b_x^L, W_y, b_y)$. We can define a new matrix $x_t$ at each time step corresponding to the concatenation of all RNN layers: $x_t \equiv (x_t^1 \cdots x_t^L)$. We also introduce two sequences of random noises as i.i.d real valued random variables $\epsilon$ and $\eta$. We can now write our model in terms of two functions $f$ and $g$ as:
 
 \begin{equation}
     \left\{
