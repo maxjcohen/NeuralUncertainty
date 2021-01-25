@@ -95,8 +95,13 @@ We now have an expression for minimizing both $\Sigma$ matrices given a value of
     \item We can also ignore the explicit expression for the covariant matrices, and approximate both $\theta$ and $\Sigma$ by gradient descent at each time step. Although we're putting aside a valuable result about $\Sigma$, this method could prove more efficient from an implementation perspective.
 \end{enumerate}
 
+In the following sections, we will detail the second option.
+In Section~\ref{sec:smc}, we detail the approximation of the posterior law through Sequential Monte Carlo approaches.
+In Section~\ref{sec:gradient_descent}, we describe the algorithm to train our model through gradient descent.
+
 
 \section{Sequential Monte Carlo Approach}
+\label{sec:smc}
 In order to compute the conditional expectations in the previous expressions, we will sample trajectories $\xi_{1:T}^m$ associated with the weights $\omega_T^m$ with respect to the density $p_{\theta}(x | y)$, using a sequential Monte Carlo particle filter.
 
 We sample particles iteratively. At time step $k=0$, $(\xi_0^l)_{l=1}^N$ are sampled independently from the instrumental density $\rho_0$ and each particle is associated with the standard importance sampling weight:
@@ -118,6 +123,7 @@ We can now approximate this conditional expectation for any measurable bounded f
 \end{align*}
 
 \section{Gradient descent}
+\label{sec:gradient_descent}
 At each iteration of the EM algorithm, we start by generating a set of particles under the law $p(x|y)$, that allows us to compute a explicit value for the expectation. We can then minimize this expectation, in order to approximate the new $\theta$ candidate, using a gradient descent.
 
 \begin{align*}
