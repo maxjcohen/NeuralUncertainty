@@ -101,24 +101,30 @@ In Section~\ref{sec:gradient_descent}, we describe the algorithm to train our mo
 
 \section{Sequential Monte Carlo Approach}
 \label{sec:smc}
-In order to compute the conditional expectations in the previous expressions, we will sample trajectories $\xi_{1:T}^m$ associated with the weights $\omega_T^m$ with respect to the density $p_{\theta}(x | y)$, using a sequential Monte Carlo particle filter.
 
-We sample particles iteratively. At time step $k=0$, $(\xi_0^l)_{l=1}^N$ are sampled independently from the instrumental density $\rho_0$ and each particle is associated with the standard importance sampling weight:
-$$\omega_0^l=\chi(\xi_0^l) g_0(\xi_0^l) / \rho_0(\xi_0^l)$$
+\subsection{Filter}
+In order to compute the conditional expectations in the previous expressions, we will iteratively sample trajectories $\xi_{1:T}^i$ associated with weights $\omega^i$ with respect to the density $p_\theta(x | y)$, using a sequential Monte Carlo particle filter.
 
-At time $k$, we choose to propagate the previous particle ($\xi_{k-1}^l$) with density:
-$$\pi_k(l, x) \propto \omega_{k-1}^l \nu(\xi_{k-1}^l) p_k(\xi_{k-1}^l, x) $$
+At time step $k=1$, $(\xi_1^l)_{l=1}^N$ are sampled independently from the first hidden state, and associated with sampling weights proportional to the observation density $q_\theta$:
+\begin{align*}
+    \xi_1^i    & \sim \mathcal{N}(x_1, \Sigma_x) \\
+    \omega_1^i & \sim q_\theta(\xi_1^i)
+\end{align*}
 
-Particles are associated with weights:
-$$\omega_k^l = \frac{q(\xi_{k-1}^{I_k^l}, \xi_k^l)}{p_k(\xi_{k-1}^{I_k^l}, \xi_k^l)} \frac{g_k(\xi_k^l)}{\nu_k(\xi_{k-1}^{I_k^l})}$$
+At time step $k+1$, we sample indices $I$ of the particles to propagate, based on their previous weights.
+After propagation, particles weights are computed following the observation density function:
+$$\mathbb{P}(I_{k+1}^i=j) = \omega_k^j \quad \forall 1 \leq j \leq N$$
+$$\omega_{k+1}^i \sim q_\theta(\xi_{k+1}^i)$$
 
+\subsection{Smoother}
 Using the poor man filter, we get $N$ trajectories:
-$$\xi_{0:k+1}^{l} = (\xi_{0:k}^{I_{k+1}^l}, \xi_{k+1}^l)$$
+$$\xi_{1:k+1}^{i} = (\xi_{1:k}^{I_{k+1}^i}, \xi_{k+1}^i)$$
 
+\subsection{Approximation}
 We can now approximate this conditional expectation for any measurable bounded function $h$:
 \begin{align*}
-    \Phi_k^M[h] & = \mathbb{E}_{\hat \mu_p} \left[ h(x_k) | y_{1:T} \right] \\
-                & = \sum_{l=1}^N \omega_T^l h(\xi_{0:T}^l)
+    \Phi_k^M[h] & = \mathbb{E}_{\hat \mu_p} \left[ h(x) | y_{1:T} \right] \\
+                & = \sum_{i=1}^N \omega_T^i h(\xi_{1:T}^i)
 \end{align*}
 
 \section{Gradient descent}
