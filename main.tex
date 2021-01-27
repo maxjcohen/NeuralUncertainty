@@ -5,6 +5,7 @@
 \usepackage{amsthm}
 \usepackage[parfill]{parskip}
 \usepackage{hyperref}
+\usepackage{color}
 
 \DeclareMathOperator*{\argmin}{\arg\!\min}
 
@@ -124,11 +125,26 @@ We can now approximate this conditional expectation for any measurable bounded f
 
 \section{Gradient descent}
 \label{sec:gradient_descent}
-At each iteration of the EM algorithm, we start by generating a set of particles under the law $p(x|y)$, that allows us to compute a explicit value for the expectation. We can then minimize this expectation, in order to approximate the new $\theta$ candidate, using a gradient descent.
 
+\subsection{Forward pass}
+During the forward pass, we generate a set of $N$ particles under the law $p(x|y)$ for fixed values of $\theta_p$, $\Sigma_{x, p}$ and $\Sigma_{y, p}$.
+In order to predict each new time step $k+1$, particles from the previous step are attributed weights $\omega_k^i$ proportionally to the density probability around the targeted value $y_k$.
+\textcolor{red}{should we add $\epsilon_k$ ?}
+
+$$\omega_k^i \sim \exp(-\frac{1}{2}(y_k - f_{\theta_p}(x_k^i))'\Sigma^{-1}_{y, p}(y_k - f_{\theta_p}(x_k^i)))$$
+We then select a new population from these particles indexed by $I_{k+1}^i$, based on their weights.
+$$\mathbb{P}(I_{k+1}^i=j) = \omega_k^j \quad \forall 1 \leq j \leq N$$
+The current hidden state is computed for the selected particles.
+$$x^i_{k+1} = g_{\theta_p}(x_k^{I_{k+1}^i}, u_{k+1}) + \eta^i_{k+1}$$
+We initialize the sequence with a random initial hidden state.
+
+\subsection{Loss function}
+Considering that we have computed a set of $N$ trajectories $(\xi^i_{1:T}),\;1 \leq i \leq N$, associated with weights $(\omega^i)$, we define our loss function as an approximation of the log likelihood:
 \begin{align*}
-    \theta_{p+1} & = \argmin_{\theta} \frac{1}{T}\sum_{k=1}^T \sum_{m=1}^M \omega_T^m (y_k - f_{\theta_p}(\xi_k^m))' \Sigma_{y, p+1}^{-1} (y_k - f_{\theta_p}(\xi_k^m)) \\
-                 & + \omega_T^m (\xi_k^m - g_{\theta_p}(\xi_{k-1}^m, u_k)'\Sigma_{x, p+1}^{-1}(\xi_k^m - g_{\theta_p}(\xi_{k-1}^m, u_k))
+    \mathbb{J}(\mu) & = \log |\Sigma_x| + \log |\Sigma_y|                                                                                                                \\
+                    & + \frac{1}{TN}\sum_{k=1}^T \sum_{i=1}^N \omega^i (y_k - f_\theta(\xi_k^i))' \Sigma_{y, p}^{-1} (y_k - f_\theta(\xi_k^i))                           \\
+                    & + \frac{1}{TN}\sum_{k=1}^T \sum_{i=1}^N \omega^i (\xi_k^i - g_\theta(\xi_{k-1}^m, u_k))'\Sigma_{x, p+1}^{-1}(\xi_k^m - g_\theta(\xi_{k-1}^m, u_k))
 \end{align*}
 
+\subsection{Backward pass}
 \end{document}
