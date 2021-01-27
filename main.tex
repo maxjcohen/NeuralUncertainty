@@ -70,23 +70,21 @@ We can start by developing the log likelihood:
                                             & - \frac{1}{2T} \sum_{k=1}^{T}(y_k - f_\theta(x_k))^T \Sigma_y^{-1} (y_k - f_\theta(x_k))                                                                                    \\
 \end{align*}
 
-We will jointly update $\Sigma_x$, $\Sigma_y$ and $\theta$ iteratively. We can start by computing the explicit form of the minimum of both covariance matrices.
-
-For $\Sigma_y$, we search the zeros of the derivate of the convex function $\Sigma_y \mapsto p_{\mu}(X_{1:T}, y_{1:T}, u_{1:T})$.
-
-\begin{align*}
-    \frac{\partial p_{\mu}(X_{1:T}, y_{1:T}, u_{1:T})}{\partial \Sigma_y^{-1}} & = \frac{1}{2} \Sigma_y - \frac{1}{2T} \sum_{k=1}^T (x_k - f_{\theta}(x_{k})) \cdot (x_k - f_{\theta}(x_{k}))'
-\end{align*}
-
-\begin{align*}
-    \frac{\partial p_{\mu}(X_{1:T}, y_{1:T}, u_{1:T})}{\partial \Sigma_y^{-1}} = 0 & \implies \Sigma_y = \frac{1}{T}\sum_{k=1}^T (y_k - f_{\theta}(x_k))(y_k - f_{\theta}(x_k))'                   \\
-    \frac{\partial p_{\mu}(X_{1:T}, y_{1:T}, u_{1:T})}{\partial \Sigma_x^{-1}} = 0 & \implies \Sigma_x = \frac{1}{T}\sum_{k=1}^T (x_k - g_{\theta}(x_{k-1}, u_k))(x_k - g_{\theta}(x_{k-1}, u_k))'
-\end{align*}
-
-
-We now have an expression for minimizing both $\Sigma$ matrices given a value of $\theta$, but we can't compute an explicit form for minimizing $\theta$. We can identify two approaches to jointly minimizing $\mu$:
+We can identify two approaches to jointly minimizing $\Sigma_x$, $\Sigma_y$ and $\theta$ iteratively:
 \begin{enumerate}
-    \item At each step of the EM algorithm, we can compute the maximum expectation for both covariant matrices given the previous value of $\theta$, then approximate the new $\theta$ by minimizing an $\argmin$, through gradient descent for example.
+    \item At each step of the EM algorithm, we can compute the maximum expectation for both covariant matrices, given the previous value of $\theta$, then approximate the new $\theta$ by minimizing an $\argmin$, through gradient descent for example.
+          To express the maximum expectation of $\Sigma_y$, we start by searching for the zeros of the derivate of the convex function $\Sigma_y \mapsto p_{\mu}(X_{1:T}, y_{1:T}, u_{1:T})$.
+          Results are similar for $\Sigma_x$.
+
+          \begin{align*}
+              \frac{\partial p_{\mu}(X_{1:T}, y_{1:T}, u_{1:T})}{\partial \Sigma_y^{-1}} & = \frac{1}{2} \Sigma_y - \frac{1}{2T} \sum_{k=1}^T (x_k - f_{\theta}(x_{k})) \cdot (x_k - f_{\theta}(x_{k}))'
+          \end{align*}
+
+          \begin{align*}
+              \frac{\partial p_{\mu}(X_{1:T}, y_{1:T}, u_{1:T})}{\partial \Sigma_y^{-1}} = 0 & \implies \Sigma_y = \frac{1}{T}\sum_{k=1}^T (y_k - f_{\theta}(x_k))(y_k - f_{\theta}(x_k))'                   \\
+              \frac{\partial p_{\mu}(X_{1:T}, y_{1:T}, u_{1:T})}{\partial \Sigma_x^{-1}} = 0 & \implies \Sigma_x = \frac{1}{T}\sum_{k=1}^T (x_k - g_{\theta}(x_{k-1}, u_k))(x_k - g_{\theta}(x_{k-1}, u_k))'
+          \end{align*}
+
           \begin{align*}
               \Sigma_{y, p+1} & = \frac{1}{T}\sum_{k=1}^T \mathbb{E}_{\hat \mu_p} \left[ (y_k - f_{\theta_p}(x_k))(y_k - f_{\theta_p}(x_k))' | y_{1:T} \right]                   \\
               \Sigma_{x, p+1} & = \frac{1}{T}\sum_{k=1}^T \mathbb{E}_{\hat \mu_p} \left[ (x_k - g_{\theta_p}(x_{k-1}, u_k))(x_k - g_{\theta_p}(x_{k-1}, u_k))' | y_{1:T} \right] \\
