@@ -145,9 +145,9 @@ We initialize the sequence with a random initial hidden state.
 \subsection{Loss function}
 Considering that we have computed a set of $N$ trajectories $(\xi^i_{1:T}),\;1 \leq i \leq N$, associated with weights $(\omega^i)$, we define our loss function as an approximation of the log likelihood:
 \begin{align*}
-    \mathbb{J}(\mu) & = \log |\Sigma_x| + \log |\Sigma_y|                                                                                                                \\
-                    & + \frac{1}{TN}\sum_{k=1}^T \sum_{i=1}^N \omega^i (y_k - f_\theta(\xi_k^i))' \Sigma_{y, p}^{-1} (y_k - f_\theta(\xi_k^i))                           \\
-                    & + \frac{1}{TN}\sum_{k=1}^T \sum_{i=1}^N \omega^i (\xi_k^i - g_\theta(\xi_{k-1}^m, u_k))'\Sigma_{x, p+1}^{-1}(\xi_k^m - g_\theta(\xi_{k-1}^m, u_k))
+    \mathbb{J}(\mu) & = \log |\Sigma_x| + \log |\Sigma_y|                                                                                                               \\
+                    & + \frac{1}{T}\sum_{k=1}^T \sum_{i=1}^N \omega^i (y_k - f_\theta(\xi_k^i))' \Sigma_{y, p}^{-1} (y_k - f_\theta(\xi_k^i))                           \\
+                    & + \frac{1}{T}\sum_{k=1}^T \sum_{i=1}^N \omega^i (\xi_k^i - g_\theta(\xi_{k-1}^m, u_k))'\Sigma_{x, p+1}^{-1}(\xi_k^m - g_\theta(\xi_{k-1}^m, u_k))
 \end{align*}
 
 \subsection{Backward pass}
