@@ -105,7 +105,6 @@ We can now approximate this conditional expectation for any measurable bounded f
 \subsection{Forward pass}
 During the forward pass, we generate a set of $N$ particles under the law $p(x|y)$ for fixed values of $\theta_p$, $\Sigma_{x, p}$ and $\Sigma_{y, p}$.
 In order to predict each new time step $k+1$, particles from the previous step are attributed weights $\omega_k^i$ proportionally to the density probability around the targeted value $y_k$.
-\textcolor{red}{should we add $\epsilon_k$ ?}
 
 $$\omega_k^i \sim \exp(-\frac{1}{2}(y_k - f_{\theta_p}(x_k^i))'\Sigma^{-1}_{y, p}(y_k - f_{\theta_p}(x_k^i)))$$
 We then select a new population from these particles indexed by $I_{k+1}^i$, based on their weights.
