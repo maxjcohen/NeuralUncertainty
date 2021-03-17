@@ -21,12 +21,12 @@ We consider the prediction task of a set of observations $(y^1, \cdots y^T)$ giv
 We define a $L$ layer RNN followed by a fully connected layer. At time step $t$,
 
 \begin{equation*}
-    \left\{
-    \begin{aligned}
-        y_{t+1}   & = \tanh(W_y x_{t+1}^L + b_y)                                                               \\
-        x_{t+1}^l & = \tanh(W_{xx}^l x^{l}_{t} + W_{xu}^l x^{l-1}_{t+1} + b_x^l) \quad \forall 1 \leq l \leq L \\
-    \end{aligned}
-    \right.
+        \left\{
+        \begin{aligned}
+                y_{t+1}   & = \tanh(W_y x_{t+1}^L + b_y)                                                               \\
+                x_{t+1}^l & = \tanh(W_{xx}^l x^{l}_{t} + W_{xu}^l x^{l-1}_{t+1} + b_x^l) \quad \forall 1 \leq l \leq L \\
+        \end{aligned}
+        \right.
 \end{equation*}
 
 with $x_{t}^0 \equiv u_{t} \; \forall t$ and $x_{0}^l \equiv 0 \; \forall 1 \leq l \leq L$ .
@@ -37,61 +37,61 @@ We also introduce two sequences of random noises as i.i.d real valued random var
 We can now write our model in terms of two functions $f$ and $g$ as:
 
 \begin{equation}
-    \left\{
-    \begin{aligned}
-        y_{t+1} & = f_\theta(x_{t+1}) + \epsilon_{t+1}    & \text{observation model} \\
-        x_{t+1} & = g_\theta(x_{t}, u_{t+1}) + \eta_{t+1} & \text{state model}       \\
-    \end{aligned}
-    \right.
+        \left\{
+        \begin{aligned}
+                y_{t+1} & = f_\theta(x_{t+1}) + \epsilon_{t+1}    & \text{observation model} \\
+                x_{t+1} & = g_\theta(x_{t}, u_{t+1}) + \eta_{t+1} & \text{state model}       \\
+        \end{aligned}
+        \right.
 \end{equation}
 
 In the following section, we will focus on minimizing the log likelihood
 \begin{align}
-    \log \; p_{\mu}(X_{1:T}, y_{1:T}, u_{1:T})
-    \label{log_likelihood}
+        \log \; p_{\mu}(X_{1:T}, y_{1:T}, u_{1:T})
+        \label{log_likelihood}
 \end{align}
 
 \section{Minimization}
 
 In order to minimize \ref{log_likelihood}, we apply an EM strategy. Let $\mu_p = (\theta_p, \Sigma_{x, p}, \Sigma_{y, p})$, we will compute at each EM step:
 \begin{align}
-    Q(\hat \mu_p, \mu) & = \mathop{\mathbb{E}_{\hat \mu_p}} \left[ \log \; p_{\mu}(X_{1:T}, y_{1:T}, u_{1:T}) | y_{1:T} \right]
+        Q(\hat \mu_p, \mu) & = \mathop{\mathbb{E}_{\hat \mu_p}} \left[ \log \; p_{\mu}(X_{1:T}, y_{1:T}, u_{1:T}) | y_{1:T} \right]
 \end{align}
 
 We can start by developing the log likelihood:
 
 \begin{align*}
-    \log p_{\mu}(X_{1:T}, y_{1:T}, u_{1:T}) & = \frac{1}{T} \log\left(\prod_{k=1}^{T} p_{\mu}(x_k | x_{k-1}, u_k) p_{\mu}(y_k | x_k)\right)                                                                               \\
-                                            & = \frac{1}{T} \sum_{k=1}^{T} \log \; p_{\mu}(x_k | x_{k-1}, u_k) + \log \; p_{\mu}(y_k | x_k)                                                                               \\
-                                            & = \frac{1}{T} \sum_{k=1}^{T} \log \left(\det(2\pi\Sigma_x)^{-1/2} \exp(-\frac{1}{2}(x_k - g_\theta(x_{k-1}, u_{k}))^T \Sigma_x^{-1} (x_k - g_\theta(x_{k-1}, u_{k}))\right) \\
-                                            & + \log \left(det(2\pi\Sigma_y)^{-1/2} \exp(-\frac{1}{2}(y_k - f_\theta(x_k))^T \Sigma_y^{-1} (y_k - f_\theta(x_k))\right)                                                   \\
-                                            & = -\frac{1}{2} \log|\Sigma_x| -\frac{1}{2} \log|\Sigma_y|                                                                                                                   \\
-                                            & - \frac{1}{2T} \sum_{k=1}^{T}(x_k - g_\theta(x_{k-1}, u_{k}))^T \Sigma_x^{-1} (x_k - g_\theta(x_{k-1}, u_{k}))                                                              \\
-                                            & - \frac{1}{2T} \sum_{k=1}^{T}(y_k - f_\theta(x_k))^T \Sigma_y^{-1} (y_k - f_\theta(x_k))                                                                                    \\
+        \log p_{\mu}(X_{1:T}, y_{1:T}, u_{1:T}) & = \frac{1}{T} \log\left(\prod_{k=1}^{T} p_{\mu}(x_k | x_{k-1}, u_k) p_{\mu}(y_k | x_k)\right)                                                                               \\
+                                                & = \frac{1}{T} \sum_{k=1}^{T} \log \; p_{\mu}(x_k | x_{k-1}, u_k) + \log \; p_{\mu}(y_k | x_k)                                                                               \\
+                                                & = \frac{1}{T} \sum_{k=1}^{T} \log \left(\det(2\pi\Sigma_x)^{-1/2} \exp(-\frac{1}{2}(x_k - g_\theta(x_{k-1}, u_{k}))^T \Sigma_x^{-1} (x_k - g_\theta(x_{k-1}, u_{k}))\right) \\
+                                                & + \log \left(det(2\pi\Sigma_y)^{-1/2} \exp(-\frac{1}{2}(y_k - f_\theta(x_k))^T \Sigma_y^{-1} (y_k - f_\theta(x_k))\right)                                                   \\
+                                                & = -\frac{1}{2} \log|\Sigma_x| -\frac{1}{2} \log|\Sigma_y|                                                                                                                   \\
+                                                & - \frac{1}{2T} \sum_{k=1}^{T}(x_k - g_\theta(x_{k-1}, u_{k}))^T \Sigma_x^{-1} (x_k - g_\theta(x_{k-1}, u_{k}))                                                              \\
+                                                & - \frac{1}{2T} \sum_{k=1}^{T}(y_k - f_\theta(x_k))^T \Sigma_y^{-1} (y_k - f_\theta(x_k))                                                                                    \\
 \end{align*}
 
 We can identify two approaches to jointly minimizing $\Sigma_x$, $\Sigma_y$ and $\theta$ iteratively:
 \begin{enumerate}
-    \item At each step of the EM algorithm, we can compute the maximum expectation for both covariant matrices, given the previous value of $\theta$, then approximate the new $\theta$ by minimizing an $\argmin$, through gradient descent for example.
-          To express the maximum expectation of $\Sigma_y$, we start by searching for the zeros of the derivate of the convex function $\Sigma_y \mapsto p_{\mu}(X_{1:T}, y_{1:T}, u_{1:T})$.
-          Results are similar for $\Sigma_x$.
+        \item At each step of the EM algorithm, we can compute the maximum expectation for both covariant matrices, given the previous value of $\theta$, then approximate the new $\theta$ by minimizing an $\argmin$, through gradient descent for example.
+              To express the maximum expectation of $\Sigma_y$, we start by searching for the zeros of the derivate of the convex function $\Sigma_y \mapsto p_{\mu}(X_{1:T}, y_{1:T}, u_{1:T})$.
+              Results are similar for $\Sigma_x$.
 
-          \begin{align*}
-              \frac{\partial p_{\mu}(X_{1:T}, y_{1:T}, u_{1:T})}{\partial \Sigma_y^{-1}} & = \frac{1}{2} \Sigma_y - \frac{1}{2T} \sum_{k=1}^T (x_k - f_{\theta}(x_{k})) \cdot (x_k - f_{\theta}(x_{k}))'
-          \end{align*}
+              \begin{align*}
+                      \frac{\partial p_{\mu}(X_{1:T}, y_{1:T}, u_{1:T})}{\partial \Sigma_y^{-1}} & = \frac{1}{2} \Sigma_y - \frac{1}{2T} \sum_{k=1}^T (x_k - f_{\theta}(x_{k})) \cdot (x_k - f_{\theta}(x_{k}))'
+              \end{align*}
 
-          \begin{align*}
-              \frac{\partial p_{\mu}(X_{1:T}, y_{1:T}, u_{1:T})}{\partial \Sigma_y^{-1}} = 0 & \implies \Sigma_y = \frac{1}{T}\sum_{k=1}^T (y_k - f_{\theta}(x_k))(y_k - f_{\theta}(x_k))'                   \\
-              \frac{\partial p_{\mu}(X_{1:T}, y_{1:T}, u_{1:T})}{\partial \Sigma_x^{-1}} = 0 & \implies \Sigma_x = \frac{1}{T}\sum_{k=1}^T (x_k - g_{\theta}(x_{k-1}, u_k))(x_k - g_{\theta}(x_{k-1}, u_k))'
-          \end{align*}
+              \begin{align*}
+                      \frac{\partial p_{\mu}(X_{1:T}, y_{1:T}, u_{1:T})}{\partial \Sigma_y^{-1}} = 0 & \implies \Sigma_y = \frac{1}{T}\sum_{k=1}^T (y_k - f_{\theta}(x_k))(y_k - f_{\theta}(x_k))'                   \\
+                      \frac{\partial p_{\mu}(X_{1:T}, y_{1:T}, u_{1:T})}{\partial \Sigma_x^{-1}} = 0 & \implies \Sigma_x = \frac{1}{T}\sum_{k=1}^T (x_k - g_{\theta}(x_{k-1}, u_k))(x_k - g_{\theta}(x_{k-1}, u_k))'
+              \end{align*}
 
-          \begin{align*}
-              \Sigma_{y, p+1} & = \frac{1}{T}\sum_{k=1}^T \mathbb{E}_{\hat \mu_p} \left[ (y_k - f_{\theta_p}(x_k))(y_k - f_{\theta_p}(x_k))' | y_{1:T} \right]                   \\
-              \Sigma_{x, p+1} & = \frac{1}{T}\sum_{k=1}^T \mathbb{E}_{\hat \mu_p} \left[ (x_k - g_{\theta_p}(x_{k-1}, u_k))(x_k - g_{\theta_p}(x_{k-1}, u_k))' | y_{1:T} \right] \\
-              \theta_{p+1}    & = \argmin_{\theta} \frac{1}{T}\sum_{k=1}^T \mathbb{E}_{\hat \mu_p} [ (y_k - f_{\theta_p}(x_k))' \Sigma_{y, p+1}^{-1} (y_k - f_{\theta_p}(x_k))   \\
-                              & + (x_k - g_{\theta_p}(x_{k-1}, u_k)'\Sigma_{x, p+1}^{-1}(x_k - g_{\theta_p}(x_{k-1}, u_k)) | y_{1:T} ]
-          \end{align*}
-    \item We can also ignore the explicit expression for the covariant matrices, and approximate both $\theta$ and $\Sigma$ by gradient descent at each time step. Although we're putting aside a valuable result about $\Sigma$, this method could prove more efficient from an implementation perspective.
+              \begin{align*}
+                      \Sigma_{y, p+1} & = \frac{1}{T}\sum_{k=1}^T \mathbb{E}_{\hat \mu_p} \left[ (y_k - f_{\theta_p}(x_k))(y_k - f_{\theta_p}(x_k))' | y_{1:T} \right]                   \\
+                      \Sigma_{x, p+1} & = \frac{1}{T}\sum_{k=1}^T \mathbb{E}_{\hat \mu_p} \left[ (x_k - g_{\theta_p}(x_{k-1}, u_k))(x_k - g_{\theta_p}(x_{k-1}, u_k))' | y_{1:T} \right] \\
+                      \theta_{p+1}    & = \argmin_{\theta} \frac{1}{T}\sum_{k=1}^T \mathbb{E}_{\hat \mu_p} [ (y_k - f_{\theta_p}(x_k))' \Sigma_{y, p+1}^{-1} (y_k - f_{\theta_p}(x_k))   \\
+                                      & + (x_k - g_{\theta_p}(x_{k-1}, u_k)'\Sigma_{x, p+1}^{-1}(x_k - g_{\theta_p}(x_{k-1}, u_k)) | y_{1:T} ]
+              \end{align*}
+        \item We can also ignore the explicit expression for the covariant matrices, and approximate both $\theta$ and $\Sigma$ by gradient descent at each time step. Although we're putting aside a valuable result about $\Sigma$, this method could prove more efficient from an implementation perspective.
 \end{enumerate}
 
 In the following sections, we will detail the second option.
@@ -107,8 +107,8 @@ In order to compute the conditional expectations in the previous expressions, we
 
 At time step $k=1$, $(\xi_1^l)_{l=1}^N$ are sampled independently from the first hidden state, and associated with sampling weights proportional to the observation density $q_\theta$:
 \begin{align*}
-    \xi_1^i    & \sim \mathcal{N}(x_1, \Sigma_x) \\
-    \omega_1^i & \sim q_\theta(\xi_1^i)
+        \xi_1^i    & \sim \mathcal{N}(x_1, \Sigma_x) \\
+        \omega_1^i & \sim q_\theta(\xi_1^i)
 \end{align*}
 
 At time step $k+1$, we sample indices $I$ of the particles to propagate, based on their previous weights.
@@ -123,8 +123,8 @@ $$\xi_{1:k+1}^{i} = (\xi_{1:k}^{I_{k+1}^i}, \xi_{k+1}^i)$$
 \subsection{Approximation}
 We can now approximate this conditional expectation for any measurable bounded function $h$:
 \begin{align*}
-    \Phi_k^M[h] & = \mathbb{E}_{\hat \mu_p} \left[ h(x) | y_{1:T} \right] \\
-                & = \sum_{i=1}^N \omega_T^i h(\xi_{1:T}^i)
+        \Phi_k^M[h] & = \mathbb{E}_{\hat \mu_p} \left[ h(x) | y_{1:T} \right] \\
+                    & = \sum_{i=1}^N \omega_T^i h(\xi_{1:T}^i)
 \end{align*}
 
 \section{Gradient descent}
@@ -145,9 +145,9 @@ We initialize the sequence with a random initial hidden state.
 \subsection{Loss function}
 Considering that we have computed a set of $N$ trajectories $(\xi^i_{1:T}),\;1 \leq i \leq N$, associated with weights $(\omega^i)$, we define our loss function as an approximation of the log likelihood:
 \begin{align*}
-    \mathbb{J}(\mu) & = \log |\Sigma_x| + \log |\Sigma_y|                                                                                                               \\
-                    & + \frac{1}{T}\sum_{k=1}^T \sum_{i=1}^N \omega^i (y_k - f_\theta(\xi_k^i))' \Sigma_{y, p}^{-1} (y_k - f_\theta(\xi_k^i))                           \\
-                    & + \frac{1}{T}\sum_{k=1}^T \sum_{i=1}^N \omega^i (\xi_k^i - g_\theta(\xi_{k-1}^m, u_k))'\Sigma_{x, p+1}^{-1}(\xi_k^m - g_\theta(\xi_{k-1}^m, u_k))
+        \mathbb{J}(\mu) & = \log |\Sigma_x| + \log |\Sigma_y|                                                                                                               \\
+                        & + \frac{1}{T}\sum_{k=1}^T \sum_{i=1}^N \omega^i (y_k - f_\theta(\xi_k^i))' \Sigma_{y, p}^{-1} (y_k - f_\theta(\xi_k^i))                           \\
+                        & + \frac{1}{T}\sum_{k=1}^T \sum_{i=1}^N \omega^i (\xi_k^i - g_\theta(\xi_{k-1}^m, u_k))'\Sigma_{x, p+1}^{-1}(\xi_k^m - g_\theta(\xi_{k-1}^m, u_k))
 \end{align*}
 
 \subsection{Backward pass}
