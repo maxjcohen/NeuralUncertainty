@@ -6,6 +6,7 @@
 \usepackage[parfill]{parskip}
 \usepackage{hyperref}
 \usepackage{color}
+\usepackage[makeroom]{cancel}
 \tolerance=500
 
 \DeclareMathOperator*{\argmin}{\arg\!\min}
@@ -31,7 +32,7 @@ We define a $L$ layer RNN followed by a fully connected layer. At time step $t$,
 
 with $x_{t}^0 \equiv u_{t} \; \forall t$ and $x_{0}^l \equiv 0 \; \forall 1 \leq l \leq L$ .
 
-Let's consider the weights of the last RNN and fully connected layers as $\theta \equiv (W_{xx}^L, W_{xu}^L, b_x^L, W_y, b_y)$.
+Let's consider the weights of the last RNN and fully connected layers as $\theta \equiv (W_{xx}^L, \textcolor{red}{\cancel{W_{xu}^L}}, b_x^L, W_y, b_y)$.
 We can define a new matrix $x_t$ at each time step corresponding to the concatenation of all RNN layers: $x_t \equiv (x_t^1 \cdots x_t^L)$.
 We also introduce two sequences of random noises as i.i.d real valued random variables $\epsilon$ and $\eta$, with covariance matrices $\Sigma_y$ and $\Sigma_x$.
 We can now write our model in terms of two functions $f$ and $g$ as:
@@ -43,6 +44,7 @@ We can now write our model in terms of two functions $f$ and $g$ as:
                 x_{t+1} & = g_\theta(x_{t}, u_{t+1}) + \eta_{t+1} & \text{state model}       \\
         \end{aligned}
         \right.
+        \label{model_definition}
 \end{equation}
 
 In the following section, we will focus on maximizing the joint log likelihood:
@@ -126,4 +128,11 @@ Considering that we have computed a set of $N$ trajectories $(\xi^i_{0:T}),\;1 \
 
 \subsection{Backward pass}
 During this step, each parameter of the model is updated by gradient descent.
+
+\section{Finetuning}
+In this section, we aim at improving the weights of a model already trained in a traditional fashion.
+Given a dataset of samples $(u_{0:T}^{(i)}, y_{0:T}^{(i)})_{i=1}^m$, we consider a training of our model as defined in \ref{model_definition} without the added weights, resulting in an initial set of weights $\theta_0$.
+Because we trust the initial training has successfully extracted relevant information from the command $u$, and reached satisfactory parameters for the hidden state model, we will only adapt the parameters of the observation model.
+$\Sigma_x$ is set to a small value.
+
 \end{document}
