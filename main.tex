@@ -39,7 +39,7 @@ We can now write our model in terms of two functions $f$ and $g$ as:
 \begin{equation}
         \left\{
         \begin{aligned}
-                y_{t+1} & = f_\theta(x_{t+1}) + \epsilon_{t+1}    & \text{observation model} \\
+                y_t     & = f_\theta(x_t) + \epsilon_t            & \text{observation model} \\
                 x_{t+1} & = g_\theta(x_{t}, u_{t+1}) + \eta_{t+1} & \text{state model}       \\
         \end{aligned}
         \right.
@@ -66,8 +66,8 @@ We aim at maximizing \ref{log_likelihood} by gradient descent, by leveraging fis
 $$
         \nabla \log p_\theta(x_{0:T}, y_{0:T}, u_{0:T}) = \mathbb{E}_\theta \left[ \nabla\log p_\theta(x_{0:T}, y_{0:T}, u_{0:T}) | Y_{0:T} \right]
 $$
-
-In Section~\ref{sec:smc}, we detail the approximation of the posterior law through Sequential Monte Carlo approaches.
+In order to approximate this expectation, we need to sample from the posterior distribution $p_\theta(x|y)$.
+In Section~\ref{sec:smc}, we detail a Sequential Monte Carlo approach to this end.
 In Section~\ref{sec:gradient_descent}, we describe the algorithm to train our model through gradient descent.
 
 
@@ -77,10 +77,10 @@ In Section~\ref{sec:gradient_descent}, we describe the algorithm to train our mo
 \subsection{Filter}
 In order to compute the conditional expectations in the previous expressions, we will iteratively sample trajectories $\xi_{1:T}^i$ associated with weights $\omega^i$ with respect to the density $p_\theta(x | y)$, using a sequential Monte Carlo particle filter.
 
-At time step $k=1$, $(\xi_1^l)_{l=1}^N$ are sampled independently from the first hidden state, and associated with sampling weights proportional to the observation density $q_\theta$:
+At time step $k=0$, $(\xi_0^l)_{l=1}^N$ are sampled independently from the first hidden state, and associated with sampling weights proportional to the observation density $q_\theta$:
 \begin{align*}
-        \xi_1^i    & \sim \mathcal{N}(x_1, \Sigma_x) \\
-        \omega_1^i & \sim q_\theta(\xi_1^i)
+        \xi_0^i    & \sim \mathcal{N}(x_0, \Sigma_x) \\
+        \omega_0^i & \sim q_\theta(\xi_0^i)
 \end{align*}
 
 At time step $k+1$, we sample indices $I$ of the particles to propagate, based on their previous weights.
@@ -95,26 +95,28 @@ $$\xi_{1:k+1}^{i} = (\xi_{1:k}^{I_{k+1}^i}, \xi_{k+1}^i)$$
 \subsection{Approximation}
 We can now approximate this conditional expectation for any measurable bounded function $h$:
 \begin{align*}
-        \Phi_k^M[h] & = \mathbb{E}_{\hat \mu_p} \left[ h(x) | y_{1:T} \right] \\
-                    & = \sum_{i=1}^N \omega_T^i h(\xi_{1:T}^i)
+        \mathbb{E}_\theta \left[ h(x) | y_{1:T} \right] = \sum_{i=1}^N \omega_T^i h(\xi_{0:T}^i)
 \end{align*}
 
 \section{Gradient descent}
 \label{sec:gradient_descent}
 
 \subsection{Forward pass}
-During the forward pass, we generate a set of $N$ particles under the law $p(x|y)$ for fixed values of $\theta_p$, $\Sigma_{x, p}$ and $\Sigma_{y, p}$.
+During the forward pass, we generate a set of $N$ particles under the law $p(x|y)$ for fixed values of $\theta$, $\Sigma_x$ and $\Sigma_y$.
+We initialize the sequence with a initial hidden state sampled from the noise's distribution.
+$$
+        x^i_0 \sim \mathcal{N}(0, \Sigma_x)
+$$
 In order to predict each new time step $k+1$, particles from the previous step are attributed weights $\omega_k^i$ proportionally to the density probability around the targeted value $y_k$.
 
 $$\omega_k^i \sim \exp(-\frac{1}{2}(y_k - f_{\theta_p}(x_k^i))'\Sigma^{-1}_{y, p}(y_k - f_{\theta_p}(x_k^i)))$$
 We then select a new population from these particles indexed by $I_{k+1}^i$, based on their weights.
 $$\mathbb{P}(I_{k+1}^i=j) = \omega_k^j \quad \forall 1 \leq j \leq N$$
 The current hidden state is computed for the selected particles.
-$$x^i_{k+1} = g_{\theta_p}(x_k^{I_{k+1}^i}, u_{k+1}) + \eta^i_{k+1}$$
-We initialize the sequence with a random initial hidden state.
+$$x^i_{k+1} = g_\theta(x_k^{I_{k+1}^i}, u_{k+1}) + \eta^i_{k+1}$$
 
 \subsection{Loss function}
-Considering that we have computed a set of $N$ trajectories $(\xi^i_{1:T}),\;1 \leq i \leq N$, associated with weights $(\omega^i)$, we define our loss function as an approximation of the log likelihood:
+Considering that we have computed a set of $N$ trajectories $(\xi^i_{0:T}),\;1 \leq i \leq N$, associated with weights $(\omega^i)$, we can approximate the gradient of the log likelihood by computing the gradient of:
 \begin{align*}
         \mathbb{J}(\theta) & = \log |\Sigma_x| + \log |\Sigma_y|                                                                                                        \\
                            & + \frac{1}{T}\sum_{k=1}^T \sum_{i=1}^N \omega^i (y_k - f_\theta(\xi_k^i))' \Sigma_y^{-1} (y_k - f_\theta(\xi_k^i))                         \\
@@ -122,4 +124,5 @@ Considering that we have computed a set of $N$ trajectories $(\xi^i_{1:T}),\;1 \
 \end{align*}
 
 \subsection{Backward pass}
+During this step, each parameter of the model is updated by gradient descent.
 \end{document}
