@@ -134,10 +134,22 @@ Considering that we have computed a set of $N$ trajectories $(\xi^i_{0:T}),\;1 \
 \subsection{Backward pass}
 During this step, each parameter of the model is updated by gradient descent.
 
-\section{Finetuning}
+\section{Two-step training}
 In this section, we aim at improving the weights of a model already trained in a traditional fashion.
-Given a dataset of samples $(u_{0:T}^{(i)}, y_{0:T}^{(i)})_{i=1}^m$, we consider a training of our model as defined in \ref{model_definition} without the added weights, resulting in an initial set of weights $\theta_0$.
-Because we trust the initial training has successfully extracted relevant information from the command $u$, and reached satisfactory parameters for the hidden state model, we will only adapt the parameters of the observation model.
-$\Sigma_x$ is set to a small value.
+
+\subsection{Initial training}
+Given a dataset of samples $(u_{0:T}^{(i)}, y_{0:T}^{(i)})_{i=1}^m$, we consider a training of our model as defined in \ref{model_definition} without the added noise.
+For each sample, we simply compute a prediction $\hat y_{0:T}$ by running the input through each layer, and minimize the discrepancy to the target values by gradient descent.
+$$
+        \mathbb{J} = \| u_{0:T} - y_{0:T} \|^2
+$$
+This training results in an initial set of weights $\theta_0$.
+
+\subsection{Finetuning}
+Because we trust the initial training has successfully extracted relevant information from the command $u$, and reached satisfactory parameters for the hidden state model, we will only adapt the parameters of the observation model:
+$$
+        \theta_{finetune} \equiv (\cancel{W_{xx}}, \cancel{b_x}, W_y, b_y)
+$$
+$\Sigma_x$ is set to a small value and will not be updated during the finetuning.
 
 \end{document}
