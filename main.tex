@@ -16,32 +16,37 @@
 \author{Max Cohen}
 
 \section{Notations}
-We consider the prediction task of a set of observations $(y^1, \cdots y^T)$ given a set of input $(u^1, \cdots u^T)$.
+We consider the prediction task of a set of observations $(y^0, \cdots y^T)$ given a set of input $(u^0, \cdots u^T)$.
+The model can be built on top of a arbitrary encoder model, denoted $h$, that will be trained by gradient descent.
+Through this encoder, inputs are mapped to latent vectors:
+$$
+        h: (u^0, \cdots u^T) \mapsto (\tilde u^0, \cdots \tilde u^T)
+$$
 
 \section{Model}
-We define a $L$ layer RNN followed by a fully connected layer. At time step $t$,
+Our model can be viewed as a RNN layer followed by a fully connected layer. At time step $t$,
 
 \begin{equation*}
         \left\{
         \begin{aligned}
-                y_{t+1}   & = \tanh(W_y x_{t+1}^L + b_y)                                                               \\
-                x_{t+1}^l & = \tanh(W_{xx}^l x^{l}_{t} + W_{xu}^l x^{l-1}_{t+1} + b_x^l) \quad \forall 1 \leq l \leq L \\
+                y_{t+1} & = \tanh(W_y x_{t+1}^L + b_y)                        \\
+                x_{t+1} & = \tanh(W_{xx} x_{t} + W_{xu} \tilde u_{t+1} + b_x) \\
         \end{aligned}
         \right.
 \end{equation*}
 
-with $x_{t}^0 \equiv u_{t} \; \forall t$ and $x_{0}^l \equiv 0 \; \forall 1 \leq l \leq L$ .
+with $x_{0} \equiv 0$ .
 
-Let's consider the weights of the last RNN and fully connected layers as $\theta \equiv (W_{xx}^L, \textcolor{red}{\cancel{W_{xu}^L}}, b_x^L, W_y, b_y)$.
-We can define a new matrix $x_t$ at each time step corresponding to the concatenation of all RNN layers: $x_t \equiv (x_t^1 \cdots x_t^L)$.
-We also introduce two sequences of random noises as i.i.d real valued random variables $\epsilon$ and $\eta$, with covariance matrices $\Sigma_y$ and $\Sigma_x$.
+Let's consider the weights of the last RNN and fully connected layers as $\theta \equiv (W_{xx}, \textcolor{red}{\cancel{W_{xu}}}, b_x, W_y, b_y)$.
+We introduce two sequences of random noises as i.i.d real valued random variables $\epsilon$ and $\eta$, with covariance matrices $\Sigma_y$ and $\Sigma_x$.
 We can now write our model in terms of two functions $f$ and $g$ as:
 
 \begin{equation}
         \left\{
         \begin{aligned}
-                y_t     & = f_\theta(x_t) + \epsilon_t            & \text{observation model} \\
-                x_{t+1} & = g_\theta(x_{t}, u_{t+1}) + \eta_{t+1} & \text{state model}       \\
+                y_t        & = f_\theta(x_t) + \epsilon_t            & \text{observation model} \\
+                x_{t+1}    & = g_\theta(x_{t}, u_{t+1}) + \eta_{t+1} & \text{state model}       \\
+                \tilde u_t & = h(u_t)                                & \text{command model}
         \end{aligned}
         \right.
         \label{model_definition}
