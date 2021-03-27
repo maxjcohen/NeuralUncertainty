@@ -138,6 +138,7 @@ During this step, each parameter of the model is updated by gradient descent.
 In this section, we aim at improving the weights of a model already trained in a traditional fashion.
 
 \subsection{Initial training}
+\label{sec:pretrain}
 Given a dataset of samples $(u_{0:T}^{(i)}, y_{0:T}^{(i)})_{i=1}^m$, we consider a training of our model as defined in \ref{model_definition} without the added noise.
 For each sample, we simply compute a prediction $\hat y_{0:T}$ by running the input through each layer, and minimize the discrepancy to the target values by gradient descent.
 $$
@@ -151,5 +152,39 @@ $$
         \theta_{finetune} \equiv (\cancel{W_{xx}}, \cancel{b_x}, W_y, b_y)
 $$
 $\Sigma_x$ is set to a small value and will not be updated during the finetuning.
+
+\chapter{Simulation plan}
+\section{Finetuning for noisy dataset}
+For this simulation, our objective is to generate a noisy dataset of pairs $(u_{0:T}^{(i)}, y_{0:T}^{(i)})_{i=1}^m$, to obtain an initial set of parameters by traditional gradient descent minimizing a loss criterion, then fine-tune by adding noise to the model and maximizing the log likelihood.
+In this section, we assume that $h$ is the identity function, meaning the latent vector is equal to the input:
+$$
+\tilde u \equiv u
+$$
+
+\subsection{Dataset}
+We sample the dataset using the model defined in \ref{model_definition}.
+$W_{xi}$ is set to a high value, and $W_{xx}$ to a small value, for the observation to carry more information from the input than the hidden state.
+This will prevent the particle filter to simply learn a good posterior.
+$\Sigma_x$ and $\Sigma_y$ are set to small values in order to keep the model's dependency on input and hidden state, while still preventing a traditional training from obtaining zero loss.
+We use $T=50$ and generate $m=100$ samples.
+
+\subsection{Pre training}
+Pre training is implemented as described in Section~\ref{sec:pretrain}.
+In our experimentation, we were able to recover the simulation parameters, although the model does not require to be identifiable, as demonstrated in the next simulation plan.
+During prediction, the model matches our simulated dataset to some extent.
+The general trend were correctly followed, while some of the most extremal points could not be reached, as this simple model doesn't account for model or observation noise.
+
+\subsection{Finetuning}
+We now freeze the model's parameters, except for $W_y$, $b_y$ and $\Sigma_y$.
+$\Sigma_x$ is set to a small value.
+We maximize the log likelihood as previously described in the model definition.
+We found $W_y$ and $b_y$ to vary during training, but eventually reached the original values at convergence.
+We were also able to recover the original value of $\Sigma_y$.
+
+\subsection{Training from scratch}
+As a comparison, we trained the model by maximizing the log likelihood without any prior trainings.
+Weights are not frozen.
+We found convergence to be much harder to achieve than both previous methods, but we were still able to recover the value of $\Sigma_y$.
+
 
 \end{document}
