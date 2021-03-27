@@ -1,4 +1,4 @@
-\documentclass[10pt,a4paper]{article}
+\documentclass[10pt,a4paper]{report}
 
 \usepackage{amsfonts}
 \usepackage{amsmath}
@@ -12,9 +12,13 @@
 \DeclareMathOperator*{\argmin}{\arg\!\min}
 
 \begin{document}
-\title{Neural Uncertainty}
+\title{Sequential Neural Monte Carlo}
 \author{Max Cohen}
 
+% \maketitle
+\tableofcontents
+
+\chapter{Model}
 \section{Notations}
 We consider the prediction task of a set of observations $(y^0, \cdots y^T)$ given a set of input $(u^0, \cdots u^T)$.
 The model can be built on top of a arbitrary encoder model, denoted $h$, that will be trained by gradient descent.
@@ -158,7 +162,7 @@ $\Sigma_x$ is set to a small value and will not be updated during the finetuning
 For this simulation, our objective is to generate a noisy dataset of pairs $(u_{0:T}^{(i)}, y_{0:T}^{(i)})_{i=1}^m$, to obtain an initial set of parameters by traditional gradient descent minimizing a loss criterion, then fine-tune by adding noise to the model and maximizing the log likelihood.
 In this section, we assume that $h$ is the identity function, meaning the latent vector is equal to the input:
 $$
-\tilde u \equiv u
+        \tilde u \equiv u
 $$
 
 \subsection{Dataset}
