@@ -48,9 +48,9 @@ We can now write our model in terms of two functions $f$ and $g$ as:
 \begin{equation}
         \left\{
         \begin{aligned}
-                y_t        & = f_\theta(x_t) + \epsilon_t            & \text{observation model} \\
-                x_{t+1}    & = g_\theta(x_{t}, u_{t+1}) + \eta_{t+1} & \text{state model}       \\
-                \tilde u_t & = h(u_t)                                & \text{command model}
+                y_t        & = f_\theta(x_t) + \epsilon_t                   & \text{observation model} \\
+                x_{t+1}    & = g_\theta(x_{t}, \tilde u_{t+1}) + \eta_{t+1} & \text{state model}       \\
+                \tilde u_t & = h(u_t)                                       & \text{command model}
         \end{aligned}
         \right.
         \label{model_definition}
