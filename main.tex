@@ -190,5 +190,19 @@ As a comparison, we trained the model by maximizing the log likelihood without a
 Weights are not frozen.
 We found convergence to be much harder to achieve than both previous methods, but we were still able to recover the value of $\Sigma_y$.
 
+\section{Finetuning advanced models}
+In this section, we reiterate the experiment of the previous section while considering a model where $h$ is an arbitrary non linear function, such as a neural network.
+We use the same dataset.
+Similarly, the static model is able to capture trends, without being able to match all points due to observation noise.
+The Bayesian model is able to take advantage of the retrain, and recover the observation noise while only slightly straying from the original values of $W_y$ and $b_y$.
+
+\section{Real data}
+This section addresses the training protocol on real data.
+We follow the same steps as for synthetic data:
+
+\begin{enumerate}
+        \item A training step expected to reach a satisfactory set of parameters for the encoder $h$ and the state model $g_\theta$.
+        \item A finetuning step, during which only $W_y$, $b_y$ and $\Sigma_y$ are learned via Fisher's identity, for a set value of $\Sigma_x$.
+\end{enumerate}
 
 \end{document}
