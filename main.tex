@@ -89,14 +89,14 @@ In Section~\ref{sec:gradient_descent}, we describe the algorithm to train our mo
 \subsection{Filter}
 In order to compute the conditional expectations in the previous expressions, we will iteratively sample trajectories $\xi_{1:T}^i$ associated with weights $\omega^i$ with respect to the density $p_\theta(x | y)$, using a sequential Monte Carlo particle filter.
 
-At time step $k=0$, $(\xi_0^l)_{l=1}^N$ are sampled independently from the first hidden state, and associated with sampling weights proportional to the observation density $q_\theta$:
+At time step $k=0$, $(\xi_0^l)_{l=1}^N$ are sampled independently from the first hidden state, and associated with sampling weights proportional to the observation density:
 \begin{align*}
         \xi_0^i    & \sim \mathcal{N}(x_0, \Sigma_x) \\
-        \omega_0^i & \sim q_\theta(\xi_0^i)
+        \omega_0^i & \sim p_\theta(y_0|\xi_0^i)
 \end{align*}
 
 At time step $k+1$, we sample indices $I$ of the particles to propagate, based on their previous weights.
-After propagation, particles weights are computed following the observation density function:
+After propagation, particles weights are computed following the observation density:
 $$\mathbb{P}(I_{k+1}^i=j) = \omega_k^j \quad \forall 1 \leq j \leq N$$
 $$\omega_{k+1}^i \sim q_\theta(\xi_{k+1}^i)$$
 
