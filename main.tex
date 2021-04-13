@@ -3,6 +3,7 @@
 \usepackage{amsfonts}
 \usepackage{amsmath}
 \usepackage{amsthm}
+\usepackage[ruled,vlined]{algorithm2e}
 \usepackage[parfill]{parskip}
 \usepackage{hyperref}
 \usepackage{color}
@@ -98,7 +99,23 @@ At time step $k=0$, $(\xi_0^l)_{l=1}^N$ are sampled independently from the first
 At time step $k+1$, we sample indices $I$ of the particles to propagate, based on their previous weights.
 After propagation, particles weights are computed following the observation density:
 $$\mathbb{P}(I_{k+1}^i=j) = \omega_k^j \quad \forall 1 \leq j \leq N$$
-$$\omega_{k+1}^i \sim q_\theta(\xi_{k+1}^i)$$
+
+\begin{align*}
+    \xi_{k+1}^i &\sim p_\theta(x_{k+1}|\xi_k^{I_{k+1}^i}) \\
+    \omega_{k+1}^i &\sim p_\theta(y_{k+1}|\xi_{k+1}^i) \\
+\end{align*}
+
+\begin{algorithm}
+    \KwIn{$\theta, y_{1:T}, u_{1:T}$}
+    \KwOut{$\xi_{1:T}^{1:N}$}
+    $\xi_0^i \gets \eta^i$\;
+    \For{$k \gets 0$ \KwTo $T$}{
+        $\omega_k^i \gets \varphi_{y_k, \Sigma_y}(f_\theta(\xi_k^i))$\;
+        $I_{k+1}^i \sim \mathbb{P}(I_{k+1}^i=j) = \omega_k^j$\;
+        $\xi_{k+1}^i \gets g_\theta(\xi_k^{I_{k+1}^i}, u_{k+1}) + \eta^i$\;
+    }
+    \caption{Particle filter}
+\end{algorithm}
 
 \subsection{Smoother}
 Using the poor man filter, we get $N$ trajectories:
@@ -115,17 +132,6 @@ We can now approximate this conditional expectation for any measurable bounded f
 
 \subsection{Forward pass}
 During the forward pass, we generate a set of $N$ particles under the law $p(x|y)$ for fixed values of $\theta$, $\Sigma_x$ and $\Sigma_y$.
-We initialize the sequence with a initial hidden state sampled from the noise's distribution.
-$$
-        x^i_0 \sim \mathcal{N}(0, \Sigma_x)
-$$
-In order to predict each new time step $k+1$, particles from the previous step are attributed weights $\omega_k^i$ proportionally to the density probability around the targeted value $y_k$.
-
-$$\omega_k^i \sim \exp(-\frac{1}{2}(y_k - f_{\theta_p}(x_k^i))'\Sigma^{-1}_{y, p}(y_k - f_{\theta_p}(x_k^i)))$$
-We then select a new population from these particles indexed by $I_{k+1}^i$, based on their weights.
-$$\mathbb{P}(I_{k+1}^i=j) = \omega_k^j \quad \forall 1 \leq j \leq N$$
-The current hidden state is computed for the selected particles.
-$$x^i_{k+1} = g_\theta(x_k^{I_{k+1}^i}, u_{k+1}) + \eta^i_{k+1}$$
 
 \subsection{Loss function}
 Considering that we have computed a set of $N$ trajectories $(\xi^i_{0:T}),\;1 \leq i \leq N$, associated with weights $(\omega^i)$, we can approximate the gradient of the log likelihood by computing the gradient of:
@@ -137,6 +143,17 @@ Considering that we have computed a set of $N$ trajectories $(\xi^i_{0:T}),\;1 \
 
 \subsection{Backward pass}
 During this step, each parameter of the model is updated by gradient descent.
+
+\subsection{Algorithm}
+\begin{algorithm}
+    \KwIn{$\theta_0, y_{1:T}, u_{1:T}$}
+    \KwOut{$\theta_p$}
+    \For{$p \gets 0$ \KwTo $n_{epochs}$}{
+        $\xi_{1:T}^{1:N} \gets \texttt{particule\_filter}(y_{1:T})$\;
+        $\theta_{p+1} \gets \theta_p - \alpha \nabla \mathbb{J}(\theta_p)$\;
+    }
+    \caption{Gradient descent}
+\end{algorithm}
 
 \section{Two-step training}
 In this section, we aim at improving the weights of a model already trained in a traditional fashion.
