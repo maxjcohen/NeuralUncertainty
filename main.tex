@@ -102,20 +102,20 @@ After propagation, particles weights are computed following the observation dens
 $$\mathbb{P}(I_{k+1}^i=j) = \omega_k^j \quad \forall 1 \leq j \leq N$$
 
 \begin{align*}
-    \xi_{k+1}^i &\sim p_\theta(x_{k+1}|\xi_k^{I_{k+1}^i}) \\
-    \omega_{k+1}^i &\sim p_\theta(y_{k+1}|\xi_{k+1}^i) \\
+        \xi_{k+1}^i    & \sim p_\theta(x_{k+1}|\xi_k^{I_{k+1}^i}) \\
+        \omega_{k+1}^i & \sim p_\theta(y_{k+1}|\xi_{k+1}^i)       \\
 \end{align*}
 
 \begin{algorithm}
-    \KwIn{$\theta, y_{1:T}, u_{1:T}$}
-    \KwOut{$\xi_{1:T}^{1:N}$}
-    $\xi_0^i \gets \eta^i$\;
-    \For{$k \gets 0$ \KwTo $T$}{
-        $\omega_k^i \gets \varphi_{y_k, \Sigma_y}(f_\theta(\xi_k^i))$\;
-        $I_{k+1}^i \sim \mathbb{P}(I_{k+1}^i=j) = \omega_k^j$\;
-        $\xi_{k+1}^i \gets g_\theta(\xi_k^{I_{k+1}^i}, u_{k+1}) + \eta^i$\;
-    }
-    \caption{Particle filter}
+        \KwIn{$\theta, y_{1:T}, u_{1:T}$}
+        \KwOut{$\xi_{1:T}^{1:N}$}
+        $\xi_0^i \gets \eta^i$\;
+        \For{$k \gets 0$ \KwTo $T$}{
+                $\omega_k^i \gets \varphi_{y_k, \Sigma_y}(f_\theta(\xi_k^i))$\;
+                $I_{k+1}^i \sim \mathbb{P}(I_{k+1}^i=j) = \omega_k^j$\;
+                $\xi_{k+1}^i \gets g_\theta(\xi_k^{I_{k+1}^i}, u_{k+1}) + \eta^i$\;
+        }
+        \caption{Particle filter}
 \end{algorithm}
 
 \subsection{Smoother}
@@ -147,13 +147,13 @@ During this step, each parameter of the model is updated by gradient descent.
 
 \subsection{Algorithm}
 \begin{algorithm}
-    \KwIn{$\theta_0, y_{1:T}, u_{1:T}$}
-    \KwOut{$\theta_p$}
-    \For{$p \gets 0$ \KwTo $n_{epochs}$}{
-        $\xi_{1:T}^{1:N} \gets \texttt{particule\_filter}(y_{1:T})$\;
-        $\theta_{p+1} \gets \theta_p - \alpha \nabla \mathbb{J}(\theta_p)$\;
-    }
-    \caption{Gradient descent}
+        \KwIn{$\theta_0, y_{1:T}, u_{1:T}$}
+        \KwOut{$\theta_p$}
+        \For{$p \gets 0$ \KwTo $n_{epochs}$}{
+                $\xi_{1:T}^{1:N} \gets \texttt{particule\_filter}(y_{1:T})$\;
+                $\theta_{p+1} \gets \theta_p - \alpha \nabla \mathbb{J}(\theta_p)$\;
+        }
+        \caption{Gradient descent}
 \end{algorithm}
 
 \section{Two-step training}
@@ -179,8 +179,8 @@ $\Sigma_x$ is set to a small value and will not be updated during the finetuning
 Suppose that at time $t$, we have access to past observations $y_{1:t}$, along with current weighted particles trajectories $\{\xi_t^i, \omega_t^i\}_{1 \leq i \leq N}$.
 Then,
 \begin{align*}
-        p(y_{t+1}|y_{1:t}) & = \int p(y_{t+1}, x_{t+1}, x_t|y_{1:t})\mathrm{d}x_{t+1}\mathrm{d}x_t                    \\
-                           & = \int p(y_{t+1}|x_{t+1}) p(x_{t+1}|x_t) p(x_t|y_{1:t})\mathrm{d}x_{t+1}\mathrm{d}x_t    \\
+        p(y_{t+1}|y_{1:t}) & = \int p(y_{t+1}, x_{t+1}, x_t|y_{1:t})\mathrm{d}x_{t+1}\mathrm{d}x_t                        \\
+                           & = \int p(y_{t+1}|x_{t+1}) p(x_{t+1}|x_t) p(x_t|y_{1:t})\mathrm{d}x_{t+1}\mathrm{d}x_t        \\
                            & \approx \sum_{i=1}^N \omega_t^i \int p(y_{t+1}|x_{t+1}) p(x_{t+1}|\xi_t^i) \mathrm{d}x_{t+1} \\
 \end{align*}
 
