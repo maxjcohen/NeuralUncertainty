@@ -11,6 +11,7 @@
 \tolerance=500
 
 \DeclareMathOperator*{\argmin}{\arg\!\min}
+\DeclareMathOperator{\Var}{Var}
 
 \begin{document}
 \title{Sequential Neural Monte Carlo}
@@ -173,6 +174,37 @@ $$
         \theta_{finetune} \equiv (\cancel{W_{xx}}, \cancel{b_x}, W_y, b_y)
 $$
 $\Sigma_x$ is set to a small value and will not be updated during the finetuning.
+
+\section{Prediction at $t+1$}
+Suppose that at time $t$, we have access to past observations $y_{1:t}$, along with current weighted particles trajectories $\{\xi_t^i, \omega_t^i\}_{1 \leq i \leq N}$.
+Then,
+\begin{align*}
+        p(y_{t+1}|y_{1:t}) & = \int p(y_{t+1}, x_{t+1}, x_t|y_{1:t})\mathrm{d}x_{t+1}\mathrm{d}x_t                    \\
+                           & = \int p(y_{t+1}|x_{t+1}) p(x_{t+1}|x_t) p(x_t|y_{1:t})\mathrm{d}x_{t+1}\mathrm{d}x_t    \\
+                           & \approx \sum_{i=1}^N \omega_t^i \int p(y_{t+1}|x_{t+1}) p(x_{t+1}|\xi_t^i) \mathrm{d}x_{t+1} \\
+\end{align*}
+
+In order to approximate the last integral, we sample for each particle $1 \leq i \leq N$ a set of $M$ particles under the law $\hat \xi_{t+1}^{i, j} \sim p(x_{t+1}|\xi_t^i)_{1 \leq j \leq M}$.
+We write:
+\begin{align}
+        p(y_{t+1}|y_{1:t}) \approx \sum_{i=1}^N \omega_t^i \frac{1}{M} \sum_{j=j}^M p(y_{t+1}|\hat \xi_{t+1}^{i, j})
+\end{align}
+
+We want a point estimation of the observation at $t+1$ along with a quantification of the uncertainty, so we compute the mean and variance of $p(y_{t+1}|y_{1:t})$.
+\begin{align}
+        \mathbb{E}[y_{t+1}|y_{1:t}] & \approx \sum_{i=1}^N \omega_t^i \frac{1}{M} \sum_{j=j}^M \mathbb{E}[y_{t+1}|\xi_{t+1}^{i, j}]                \\
+        \Var[y_{t+1}|y_{1:t}]       & \approx \sum_{i=1}^N {\omega_t^i}^2 \frac{1}{M} \sum_{j=j}^M \Sigma_y = \Sigma_y \sum_{i=1}^N {\omega_t^i}^2
+\end{align}
+
+\begin{algorithm}
+        \KwIn{$\xi_t^{1:N}, y_{1:t}$}
+        \KwOut{$\mu_{t+1}, \sigma_{t+1}$}
+        $\hat \xi_{t+1}^{i, j} = g_\theta(\xi_t^i) + \eta_t^{i, j}$\;
+        $\mu_{t+1} = \sum_{i=1}^N \omega_t^i \frac{1}{M} \sum_{j=j}^M f_\theta(\hat \xi_{t+1}^{i, j})$\;
+        $\sigma_{t+1}^2 = \Sigma_y \sum_{i=1}^N {\omega_t^i}^2$\;
+        \caption{Prediction at time {t+1}}
+\end{algorithm}
+
 
 \chapter{Simulation plan}
 \section{Finetuning for noisy dataset}
