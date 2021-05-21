@@ -26,19 +26,19 @@ We consider the prediction task of a set of observations $(y^0, \cdots y^T)$ giv
 The model can be built on top of a arbitrary encoder model, denoted $h$, that will be trained by gradient descent.
 Through this encoder, inputs are mapped to latent vectors:
 $$
-        h: (u^0, \cdots u^T) \mapsto (\tilde u^0, \cdots \tilde u^T)
+	h: (u^0, \cdots u^T) \mapsto (\tilde u^0, \cdots \tilde u^T)
 $$
 
 \section{Model}
 Our model can be viewed as a RNN layer followed by a fully connected layer. At time step $t$,
 
 \begin{equation*}
-        \left\{
-        \begin{aligned}
-                y_{t+1} & = \tanh(W_y x_{t+1}^L + b_y)                        \\
-                x_{t+1} & = \tanh(W_{xx} x_{t} + W_{xu} \tilde u_{t+1} + b_x) \\
-        \end{aligned}
-        \right.
+	\left\{
+	\begin{aligned}
+		y_{t+1} & = \tanh(W_y x_{t+1}^L + b_y)                        \\
+		x_{t+1} & = \tanh(W_{xx} x_{t} + W_{xu} \tilde u_{t+1} + b_x) \\
+	\end{aligned}
+	\right.
 \end{equation*}
 
 with $x_{0} \equiv 0$ .
@@ -48,37 +48,37 @@ We introduce two sequences of random noises as i.i.d real valued random variable
 We can now write our model in terms of two functions $f$ and $g$ as:
 
 \begin{equation}
-        \left\{
-        \begin{aligned}
-                y_t        & = f_\theta(x_t) + \epsilon_t                   & \text{observation model} \\
-                x_{t+1}    & = g_\theta(x_{t}, \tilde u_{t+1}) + \eta_{t+1} & \text{state model}       \\
-                \tilde u_t & = h(u_t)                                       & \text{command model}
-        \end{aligned}
-        \right.
-        \label{model_definition}
+	\left\{
+	\begin{aligned}
+		y_t        & = f_\theta(x_t) + \epsilon_t                   & \text{observation model} \\
+		x_{t+1}    & = g_\theta(x_{t}, \tilde u_{t+1}) + \eta_{t+1} & \text{state model}       \\
+		\tilde u_t & = h(u_t)                                       & \text{command model}
+	\end{aligned}
+	\right.
+	\label{model_definition}
 \end{equation}
 
 In the following section, we will focus on maximizing the joint log likelihood:
 \begin{align}
-        \log \; p_{\theta}(X_{0:T}, y_{0:T}, u_{0:T})
-        \label{log_likelihood}
+	\log \; p_{\theta}(X_{0:T}, y_{0:T}, u_{0:T})
+	\label{log_likelihood}
 \end{align}
 
 \section{Minimization}
 We can start by developing the log likelihood:
 
 \begin{align*}
-        \log p_{\theta}(X_{0:T}, y_{0:T}, u_{0:T}) & = \frac{1}{T} \log\left(p_\theta(x_0)p_\theta(y_0 | x_0)\prod_{k=1}^{T} p_{\theta}(x_k | x_{k-1}, u_k) p_{\theta}(y_k | x_k)\right) \\
-                                                   & = \frac{1}{T} \log p_\theta(x_0)                                                                                                    \\
-                                                   & + \frac{1}{T} \sum_{k=1}^{T} \log \; p_{\theta}(x_k | x_{k-1}, u_k) + \frac{1}{T} \sum_{k=0}^{T} \log \; p_{\theta}(y_k | x_k)      \\
-                                                   & = \frac{1}{T} \log p_\theta(x_0) -\frac{1}{2} \log|\Sigma_x| -\frac{1}{2} \log|\Sigma_y| + Cst                                      \\
-                                                   & - \frac{1}{2T} \sum_{k=1}^{T}(x_k - g_\theta(x_{k-1}, u_{k}))' \Sigma_x^{-1} (x_k - g_\theta(x_{k-1}, u_{k}))                       \\
-                                                   & - \frac{1}{2T} \sum_{k=0}^{T}(y_k - f_\theta(x_k))' \Sigma_y^{-1} (y_k - f_\theta(x_k))                                             \\
+	\log p_{\theta}(X_{0:T}, y_{0:T}, u_{0:T}) & = \frac{1}{T} \log\left(p_\theta(x_0)p_\theta(y_0 | x_0)\prod_{k=1}^{T} p_{\theta}(x_k | x_{k-1}, u_k) p_{\theta}(y_k | x_k)\right) \\
+						   & = \frac{1}{T} \log p_\theta(x_0)                                                                                                    \\
+						   & + \frac{1}{T} \sum_{k=1}^{T} \log \; p_{\theta}(x_k | x_{k-1}, u_k) + \frac{1}{T} \sum_{k=0}^{T} \log \; p_{\theta}(y_k | x_k)      \\
+						   & = \frac{1}{T} \log p_\theta(x_0) -\frac{1}{2} \log|\Sigma_x| -\frac{1}{2} \log|\Sigma_y| + Cst                                      \\
+						   & - \frac{1}{2T} \sum_{k=1}^{T}(x_k - g_\theta(x_{k-1}, u_{k}))' \Sigma_x^{-1} (x_k - g_\theta(x_{k-1}, u_{k}))                       \\
+						   & - \frac{1}{2T} \sum_{k=0}^{T}(y_k - f_\theta(x_k))' \Sigma_y^{-1} (y_k - f_\theta(x_k))                                             \\
 \end{align*}
 
 We aim at maximizing \ref{log_likelihood} by gradient descent, by leveraging fisher's identity:
 $$
-        \nabla \log p_\theta(x_{0:T}, y_{0:T}, u_{0:T}) = \mathbb{E}_\theta \left[ \nabla\log p_\theta(x_{0:T}, y_{0:T}, u_{0:T}) | Y_{0:T} \right]
+	\nabla \log p_\theta(x_{0:T}, y_{0:T}, u_{0:T}) = \mathbb{E}_\theta \left[ \nabla\log p_\theta(x_{0:T}, y_{0:T}, u_{0:T}) | Y_{0:T} \right]
 $$
 In order to approximate this expectation, we need to sample from the posterior distribution $p_\theta(x|y)$.
 In Section~\ref{sec:smc}, we detail a Sequential Monte Carlo approach to this end.
@@ -93,8 +93,8 @@ In order to compute the conditional expectations in the previous expressions, we
 
 At time step $k=0$, $(\xi_0^l)_{l=1}^N$ are sampled independently from the first hidden state, and associated with sampling weights proportional to the observation density:
 \begin{align*}
-        \xi_0^i    & \sim \mathcal{N}(x_0, \Sigma_x) \\
-        \omega_0^i & \sim p_\theta(y_0|\xi_0^i)
+	\xi_0^i    & \sim \mathcal{N}(x_0, \Sigma_x) \\
+	\omega_0^i & \sim p_\theta(y_0|\xi_0^i)
 \end{align*}
 
 At time step $k+1$, we sample indices $I$ of the particles to propagate, based on their previous weights.
@@ -102,20 +102,20 @@ After propagation, particles weights are computed following the observation dens
 $$\mathbb{P}(I_{k+1}^i=j) = \omega_k^j \quad \forall 1 \leq j \leq N$$
 
 \begin{align*}
-        \xi_{k+1}^i    & \sim p_\theta(x_{k+1}|\xi_k^{I_{k+1}^i}) \\
-        \omega_{k+1}^i & \sim p_\theta(y_{k+1}|\xi_{k+1}^i)       \\
+	\xi_{k+1}^i    & \sim p_\theta(x_{k+1}|\xi_k^{I_{k+1}^i}) \\
+	\omega_{k+1}^i & \sim p_\theta(y_{k+1}|\xi_{k+1}^i)       \\
 \end{align*}
 
 \begin{algorithm}
-        \KwIn{$\theta, y_{1:T}, u_{1:T}$}
-        \KwOut{$\xi_{1:T}^{1:N}$}
-        $\xi_0^i \gets \eta^i$\;
-        \For{$k \gets 0$ \KwTo $T$}{
-                $\omega_k^i \gets \varphi_{y_k, \Sigma_y}(f_\theta(\xi_k^i))$\;
-                $I_{k+1}^i \sim \mathbb{P}(I_{k+1}^i=j) = \omega_k^j$\;
-                $\xi_{k+1}^i \gets g_\theta(\xi_k^{I_{k+1}^i}, u_{k+1}) + \eta^i$\;
-        }
-        \caption{Particle filter}
+	\KwIn{$\theta, y_{1:T}, u_{1:T}$}
+	\KwOut{$\xi_{1:T}^{1:N}$}
+	$\xi_0^i \gets \eta^i$\;
+	\For{$k \gets 0$ \KwTo $T$}{
+		$\omega_k^i \gets \varphi_{y_k, \Sigma_y}(f_\theta(\xi_k^i))$\;
+		$I_{k+1}^i \sim \mathbb{P}(I_{k+1}^i=j) = \omega_k^j$\;
+		$\xi_{k+1}^i \gets g_\theta(\xi_k^{I_{k+1}^i}, u_{k+1}) + \eta^i$\;
+	}
+	\caption{Particle filter}
 \end{algorithm}
 
 \subsection{Smoother}
@@ -125,7 +125,7 @@ $$\xi_{1:k+1}^{i} = (\xi_{1:k}^{I_{k+1}^i}, \xi_{k+1}^i)$$
 \subsection{Approximation}
 We can now approximate this conditional expectation for any measurable bounded function $h$:
 \begin{align*}
-        \mathbb{E}_\theta \left[ h(x) | y_{1:T} \right] = \sum_{i=1}^N \omega_T^i h(\xi_{0:T}^i)
+	\mathbb{E}_\theta \left[ h(x) | y_{1:T} \right] = \sum_{i=1}^N \omega_T^i h(\xi_{0:T}^i)
 \end{align*}
 
 \section{Gradient descent}
@@ -137,9 +137,9 @@ During the forward pass, we generate a set of $N$ particles under the law $p(x|y
 \subsection{Loss function}
 Considering that we have computed a set of $N$ trajectories $(\xi^i_{0:T}),\;1 \leq i \leq N$, associated with weights $(\omega^i)$, we can approximate the gradient of the log likelihood by computing the gradient of:
 \begin{align*}
-        \mathbb{J}(\theta) & = \log |\Sigma_x| + \log |\Sigma_y|                                                                                                        \\
-                           & + \frac{1}{T}\sum_{k=1}^T \sum_{i=1}^N \omega^i (y_k - f_\theta(\xi_k^i))' \Sigma_y^{-1} (y_k - f_\theta(\xi_k^i))                         \\
-                           & + \frac{1}{T}\sum_{k=0}^T \sum_{i=1}^N \omega^i (\xi_k^i - g_\theta(\xi_{k-1}^i, u_k))'\Sigma_x^{-1}(\xi_k^i - g_\theta(\xi_{k-1}^i, u_k))
+	\mathbb{J}(\theta) & = \log |\Sigma_x| + \log |\Sigma_y|                                                                                                        \\
+			   & + \frac{1}{T}\sum_{k=1}^T \sum_{i=1}^N \omega^i (y_k - f_\theta(\xi_k^i))' \Sigma_y^{-1} (y_k - f_\theta(\xi_k^i))                         \\
+			   & + \frac{1}{T}\sum_{k=0}^T \sum_{i=1}^N \omega^i (\xi_k^i - g_\theta(\xi_{k-1}^i, u_k))'\Sigma_x^{-1}(\xi_k^i - g_\theta(\xi_{k-1}^i, u_k))
 \end{align*}
 
 \subsection{Backward pass}
@@ -147,13 +147,13 @@ During this step, each parameter of the model is updated by gradient descent.
 
 \subsection{Algorithm}
 \begin{algorithm}
-        \KwIn{$\theta_0, y_{1:T}, u_{1:T}$}
-        \KwOut{$\theta_p$}
-        \For{$p \gets 0$ \KwTo $n_{epochs}$}{
-                $\xi_{1:T}^{1:N} \gets \texttt{particule\_filter}(y_{1:T})$\;
-                $\theta_{p+1} \gets \theta_p - \alpha \nabla \mathbb{J}(\theta_p)$\;
-        }
-        \caption{Gradient descent}
+	\KwIn{$\theta_0, y_{1:T}, u_{1:T}$}
+	\KwOut{$\theta_p$}
+	\For{$p \gets 0$ \KwTo $n_{epochs}$}{
+		$\xi_{1:T}^{1:N} \gets \texttt{particule\_filter}(y_{1:T})$\;
+		$\theta_{p+1} \gets \theta_p - \alpha \nabla \mathbb{J}(\theta_p)$\;
+	}
+	\caption{Gradient descent}
 \end{algorithm}
 
 \section{Two-step training}
@@ -164,14 +164,14 @@ In this section, we aim at improving the weights of a model already trained in a
 Given a dataset of samples $(u_{0:T}^{(i)}, y_{0:T}^{(i)})_{i=1}^m$, we consider a training of our model as defined in \ref{model_definition} without the added noise.
 For each sample, we simply compute a prediction $\hat y_{0:T}$ by running the input through each layer, and minimize the discrepancy to the target values by gradient descent.
 $$
-        \mathbb{J} = \| u_{0:T} - y_{0:T} \|^2
+	\mathbb{J} = \| u_{0:T} - y_{0:T} \|^2
 $$
 This training results in an initial set of weights $\theta_0$.
 
 \subsection{Finetuning}
 Because we trust the initial training has successfully extracted relevant information from the command $u$, and reached satisfactory parameters for the hidden state model, we will only adapt the parameters of the observation model:
 $$
-        \theta_{finetune} \equiv (\cancel{W_{xx}}, \cancel{b_x}, W_y, b_y)
+	\theta_{finetune} \equiv (\cancel{W_{xx}}, \cancel{b_x}, W_y, b_y)
 $$
 $\Sigma_x$ is set to a small value and will not be updated during the finetuning.
 
@@ -179,9 +179,9 @@ $\Sigma_x$ is set to a small value and will not be updated during the finetuning
 Suppose that at time $t$, we have access to past observations $y_{1:t}$, along with current weighted particles trajectories $\{\xi_t^i, \omega_t^i\}_{1 \leq i \leq N}$.
 Then,
 \begin{align*}
-        p(y_{t+1}|y_{1:t}) & = \int p(y_{t+1}, x_{t+1}, x_t|y_{1:t})\mathrm{d}x_{t+1}\mathrm{d}x_t                        \\
-                           & = \int p(y_{t+1}|x_{t+1}) p(x_{t+1}|x_t) p(x_t|y_{1:t})\mathrm{d}x_{t+1}\mathrm{d}x_t        \\
-                           & \approx \sum_{i=1}^N \omega_t^i \int p(y_{t+1}|x_{t+1}) p(x_{t+1}|\xi_t^i) \mathrm{d}x_{t+1} \\
+	p(y_{t+1}|y_{1:t}) & = \int p(y_{t+1}, x_{t+1}, x_t|y_{1:t})\mathrm{d}x_{t+1}\mathrm{d}x_t                        \\
+			   & = \int p(y_{t+1}|x_{t+1}) p(x_{t+1}|x_t) p(x_t|y_{1:t})\mathrm{d}x_{t+1}\mathrm{d}x_t        \\
+			   & \approx \sum_{i=1}^N \omega_t^i \int p(y_{t+1}|x_{t+1}) p(x_{t+1}|\xi_t^i) \mathrm{d}x_{t+1} \\
 \end{align*}
 
 In order to approximate the last integral, we sample for each particle $1 \leq i \leq N$ a set of $M$ states under the law $\hat x_{t+1}^{i, j} \sim p(x_{t+1}|\xi_t^i)_{1 \leq j \leq M}$.
@@ -213,7 +213,7 @@ Accounting for $p(y_{t+1} | \hat x_{t+1}) \sim \mathcal{N}(f_\theta(\hat x_{t+1}
 For this simulation, our objective is to generate a noisy dataset of pairs $(u_{0:T}^{(i)}, y_{0:T}^{(i)})_{i=1}^m$, to obtain an initial set of parameters by traditional gradient descent minimizing a loss criterion, then fine-tune by adding noise to the model and maximizing the log likelihood.
 In this section, we assume that $h$ is the identity function, meaning the latent vector is equal to the input:
 $$
-        \tilde u \equiv u
+	\tilde u \equiv u
 $$
 
 \subsection{Dataset}
@@ -252,8 +252,8 @@ This section addresses the training protocol on real data.
 We follow the same steps as for synthetic data:
 
 \begin{enumerate}
-        \item A training step expected to reach a satisfactory set of parameters for the encoder $h$ and the state model $g_\theta$.
-        \item A finetuning step, during which only $W_y$, $b_y$ and $\Sigma_y$ are learned via Fisher's identity, for a set value of $\Sigma_x$.
+	\item A training step expected to reach a satisfactory set of parameters for the encoder $h$ and the state model $g_\theta$.
+	\item A finetuning step, during which only $W_y$, $b_y$ and $\Sigma_y$ are learned via Fisher's identity, for a set value of $\Sigma_x$.
 \end{enumerate}
 
 \end{document}
