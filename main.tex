@@ -203,7 +203,7 @@ Accounting for $p(y_{t+1} | \hat x_{t+1}) \sim \mathcal{N}(f_\theta(\hat x_{t+1}
 	\KwOut{$\mu_{t+1}, \sigma_{t+1}$}
 	$\hat x_{t+1}^{i, j} = g_\theta(\xi_t^i) + \eta_t^{i, j}$\;
 	$\mu_{t+1} = \sum_{i=1}^N \omega_t^i \frac{1}{M} \sum_{j=1}^M f_\theta(\hat \xi_{t+1}^{i, j})$\;
-	$\sigma_{t+1}^2 = \sum_{i=1}^N \omega_t^i \frac{1}{M} \sum_{j=1}^M (\Sigma_y + f_\theta(\hat \xi_{t+1}^{i, j})^2) - \mu_{t+1|t}^2$\;
+	$\sigma_{t+1}^2 = \Sigma_y + \sum_{i=1}^N \omega_t^i \frac{1}{M} \sum_{j=1}^M f_\theta(\hat \xi_{t+1}^{i, j})^2 - \mu_{t+1|t}^2$\;
 	\caption{Prediction at time {t+1}}
 \end{algorithm}
 
