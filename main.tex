@@ -184,25 +184,27 @@ Then,
                            & \approx \sum_{i=1}^N \omega_t^i \int p(y_{t+1}|x_{t+1}) p(x_{t+1}|\xi_t^i) \mathrm{d}x_{t+1} \\
 \end{align*}
 
-In order to approximate the last integral, we sample for each particle $1 \leq i \leq N$ a set of $M$ particles under the law $\hat \xi_{t+1}^{i, j} \sim p(x_{t+1}|\xi_t^i)_{1 \leq j \leq M}$.
+In order to approximate the last integral, we sample for each particle $1 \leq i \leq N$ a set of $M$ states under the law $\hat x_{t+1}^{i, j} \sim p(x_{t+1}|\xi_t^i)_{1 \leq j \leq M}$.
 We write:
 \begin{align}
-        p(y_{t+1}|y_{1:t}) \approx \sum_{i=1}^N \omega_t^i \frac{1}{M} \sum_{j=j}^M p(y_{t+1}|\hat \xi_{t+1}^{i, j})
+	p(y_{t+1}|y_{1:t}) \approx \sum_{i=1}^N \omega_t^i \frac{1}{M} \sum_{j=1}^M p(y_{t+1}|\hat x_{t+1}^{i, j})
 \end{align}
 
 We want a point estimation of the observation at $t+1$ along with a quantification of the uncertainty, so we compute the mean and variance of $p(y_{t+1}|y_{1:t})$.
-\begin{align}
-        \mathbb{E}[y_{t+1}|y_{1:t}] & \approx \sum_{i=1}^N \omega_t^i \frac{1}{M} \sum_{j=j}^M \mathbb{E}[y_{t+1}|\xi_{t+1}^{i, j}]                \\
-        \Var[y_{t+1}|y_{1:t}]       & \approx \sum_{i=1}^N {\omega_t^i}^2 \frac{1}{M} \sum_{j=j}^M \Sigma_y = \Sigma_y \sum_{i=1}^N {\omega_t^i}^2
-\end{align}
+Accounting for $p(y_{t+1} | \hat x_{t+1}) \sim \mathcal{N}(f_\theta(\hat x_{t+1}), \Sigma_y)$:
+\begin{align*}
+	\mu_{t+1|t}      & = \mathbb{E}[y_{t+1}|y_{1:t}] \approx \sum_{i=1}^N \omega_t^i \frac{1}{M} \sum_{j=1}^M \mathbb{E}[y_{t+1}|\hat x_{t+1}^{i, j}] \\
+	\sigma_{t+1|t}^2 & = \mathbb{E}[y_{t+1}^2|y_{1:t}] - \mu_{t+1|t}^2                                                                                \\
+			 & \approx \sum_{i=1}^N {\omega_t^i} \frac{1}{M} \sum_{j=1}^M \mathbb{E}[y_{t+1}^2|\hat x_{t+1}^{i, j}] - \mu_{t+1|t}^2
+\end{align*}
 
 \begin{algorithm}
-        \KwIn{$\xi_t^{1:N}, y_{1:t}$}
-        \KwOut{$\mu_{t+1}, \sigma_{t+1}$}
-        $\hat \xi_{t+1}^{i, j} = g_\theta(\xi_t^i) + \eta_t^{i, j}$\;
-        $\mu_{t+1} = \sum_{i=1}^N \omega_t^i \frac{1}{M} \sum_{j=j}^M f_\theta(\hat \xi_{t+1}^{i, j})$\;
-        $\sigma_{t+1}^2 = \Sigma_y \sum_{i=1}^N {\omega_t^i}^2$\;
-        \caption{Prediction at time {t+1}}
+	\KwIn{$\xi_t^{1:N}, y_{1:t}$}
+	\KwOut{$\mu_{t+1}, \sigma_{t+1}$}
+	$\hat x_{t+1}^{i, j} = g_\theta(\xi_t^i) + \eta_t^{i, j}$\;
+	$\mu_{t+1} = \sum_{i=1}^N \omega_t^i \frac{1}{M} \sum_{j=1}^M f_\theta(\hat \xi_{t+1}^{i, j})$\;
+	$\sigma_{t+1}^2 = \sum_{i=1}^N \omega_t^i \frac{1}{M} \sum_{j=1}^M (\Sigma_y + f_\theta(\hat \xi_{t+1}^{i, j})^2) - \mu_{t+1|t}^2$\;
+	\caption{Prediction at time {t+1}}
 \end{algorithm}
 
 
