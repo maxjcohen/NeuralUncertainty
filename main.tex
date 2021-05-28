@@ -263,4 +263,51 @@ We follow the same steps as for synthetic data:
 	\item A finetuning step, during which only $W_y$, $b_y$ and $\Sigma_y$ are learned via Fisher's identity, for a set value of $\Sigma_x$.
 \end{enumerate}
 
+\clearpage
+\section{Calibration on Oze data}
+Calibration consists in fitting a metamodel, trained on simulated scenarios, to a specific building.
+We aim at producing a model able to mimic this building's behavior.
+In this study, we consider an additional objective: estimating the physical parameters $\lambda$ of the building.
+
+Input:
+\begin{itemize}
+	\item A physical simulator simulating an equivalent simplified building model
+	\item Building data for a month
+	\item Ranges of physical parameters $\lambda$ for the building
+	\item Ranges of usage settings $\psi$
+\end{itemize}
+
+Output:
+\begin{itemize}
+	\item A calibrated model
+	\item Estimation of physical parameters $\lambda$
+\end{itemize}
+
+\subsection{Pretraining}
+We sample a dataset of usage settings, physical parameters and weather scenarios from TRNSYS.
+We fit a RNN on this dataset with a traditional gradient descent.
+
+\subsection{Finetuning}
+We explore the ranges of physical parameters and usage settings and adjust network weights.
+We alternate iterations of the CMAES to explore the ranges with the finetuning procedure described in the previous section.
+
+\begin{algorithm}
+	\KwIn{ranges for $\lambda$ and $\psi_k$}
+	\KwOut{$\hat \lambda$; calibrated model}
+	\For{$i \gets 0$ \KwTo $T$}{
+		$\hat \lambda \gets$ CMA-ES iterations\;
+		$\theta, \Sigma_x, \Sigma_y \gets$ gradient descent on real data\;
+	}
+	\caption{Hybrid calibration procedure}
+\end{algorithm}
+
+Physical parameters will be submitted to energy managers to get an expert validation.
+
+\subsection{Validation}
+We apply the calibrated model on a set of fresh data.
+For this step, we will allow the additional calibration of usage settings $\psi$ only.
+
+\subsection{Optional: Optimization}
+This subsection is optional as a successful optimization does not validate the calibration step.
+
 \end{document}
