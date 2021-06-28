@@ -12,6 +12,7 @@
 
 \DeclareMathOperator*{\argmin}{\arg\!\min}
 \DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\diag}{diag}
 
 \begin{document}
 \title{Sequential Neural Monte Carlo}
@@ -69,6 +70,7 @@ We aim at maximizing \ref{log_likelihood} by gradient descent, by leveraging fis
 $$
 	\nabla \log p_\theta(y_{0:T}) = \mathbb{E}_\theta \left[ \nabla\log p_\theta(x_{0:T}, y_{0:T}, u_{0:T}) | Y_{0:T} \right]
 $$
+\subsection{Joint log likelihood}
 We can start by developing the joint log likelihood:
 
 \begin{align*}
@@ -80,6 +82,7 @@ We can start by developing the joint log likelihood:
 						   & - \frac{1}{2T} \sum_{k=0}^{T}(y_k - f_\theta(x_k))' \Sigma_y^{-1} (y_k - f_\theta(x_k))                                             \\
 \end{align*}
 
+\subsection{Optimization of $\Sigma_x$}
 We already have a explicit expression for $\Sigma_x$, by searching the zeros of the convex function $\Sigma_x \mapsto p_\theta(x_{0:T}, y_{0:T}, u_{0:T})$.
 With $\tilde x_k = x_k - g_\theta(x_{k-1}, u_k)$:
 
@@ -88,6 +91,24 @@ With $\tilde x_k = x_k - g_\theta(x_{k-1}, u_k)$:
 	\frac{\partial \log p_\theta(X_{1:T}, y_{1:T}, u_{1:T})}{\partial \Sigma_x} = 0 & \implies \Sigma_x^{-1} = \frac{1}{T}\sum_{k=1}^T \Sigma_x^{-1}\tilde x_k \tilde x_k'\Sigma_x^{-1}         \\
 											& \implies \Sigma_x = \frac{1}{T}\sum_{k=1}^T\tilde x_k \tilde x_k'
 \end{align*}
+
+We can constrain the covariance matrix to be diagonal in order to simplify computation and interpretation of the model, $\Sigma_x = \diag{\{\sigma_{x, i}^2\}_{i=1}^d}$.
+Let $j \in \{1 \cdots d\}$, the derivative of the log likelihood w.r.t $\sigma_{x, j}^2$ can be expressed as:
+\begin{align*}
+	\frac{\partial}{\partial \sigma_{x, j}^2} & = -\frac{1}{2} \frac{\partial}{\partial \sigma_{x, j}^2} \log|\Sigma_x|                                                                                                                                             \\
+						  & - \frac{1}{2T} \frac{\partial}{\partial \sigma_{x, j}^2} \left[ \sum_{k=1}^{T}(x_k - g_\theta(x_{k-1}, u_{k}))' \Sigma_x^{-1} (x_k - g_\theta(x_{k-1}, u_{k})) \right]                                              \\
+						  & = - \frac{\partial}{\partial \sigma_{x, j}^2} \left[ \frac{1}{2} \sum_{i=1}^d \log \sigma_{x, i}^2  + \frac{1}{2T} \sum_{k=1}^T \sum_{i=1}^d (x_k - g_\theta(x_{k-1}, u_{k}))_i^2 \frac{1}{\sigma_{x, i}^2} \right] \\
+						  & = -\frac{1}{2 \sigma_{x, j}^2} + \frac{1}{2T} \sum_{k=1}^T (x_k - g_\theta(x_{k-1}, u_{k}))_j^2 \frac{1}{\sigma_{x, j}^4}                                                                                           \\
+\end{align*}
+
+$$
+	\frac{\partial \log p_\theta(X_{1:T}, y_{1:T}, u_{1:T})}{\partial \sigma_{x, j}^2} = 0 \implies \sigma_{x, j}^2 = \frac{1}{T}\sum_{k=1}^T (x_k - g_\theta(x_{k-1}, u_k))_j^2
+$$
+
+The minimization of a diagonal covariance matrix matches the diagonal of the minimization of a full matrix:
+$$
+	\widehat \Sigma_x^{\texttt{diag}} = \diag \left( \widehat \Sigma_x \right)
+$$
 
 In order to approximate the expectation, we need to sample from the posterior distribution $p_\theta(x|y)$.
 In Section~\ref{sec:smc}, we detail a Sequential Monte Carlo approach to this end.
