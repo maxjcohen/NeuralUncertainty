@@ -58,14 +58,18 @@ We can now write our model in terms of two functions $f$ and $g$ as:
 	\label{model_definition}
 \end{equation}
 
-In the following section, we will focus on maximizing the joint log likelihood:
+In the following section, we will focus on maximizing the log likelihood:
 \begin{align}
-	\log \; p_{\theta}(X_{0:T}, y_{0:T}, u_{0:T})
+	\log \; p_{\theta}(y_{0:T})
 	\label{log_likelihood}
 \end{align}
 
 \section{Minimization}
-We can start by developing the log likelihood:
+We aim at maximizing \ref{log_likelihood} by gradient descent, by leveraging fisher's identity:
+$$
+	\nabla \log p_\theta(y_{0:T}) = \mathbb{E}_\theta \left[ \nabla\log p_\theta(x_{0:T}, y_{0:T}, u_{0:T}) | Y_{0:T} \right]
+$$
+We can start by developing the joint log likelihood:
 
 \begin{align*}
 	\log p_{\theta}(X_{0:T}, y_{0:T}, u_{0:T}) & = \frac{1}{T} \log\left(p_\theta(x_0)p_\theta(y_0 | x_0)\prod_{k=1}^{T} p_{\theta}(x_k | x_{k-1}, u_k) p_{\theta}(y_k | x_k)\right) \\
@@ -85,11 +89,7 @@ With $\tilde x_k = x_k - g_\theta(x_{k-1}, u_k)$:
 											& \implies \Sigma_x = \frac{1}{T}\sum_{k=1}^T\tilde x_k \tilde x_k'
 \end{align*}
 
-We aim at maximizing \ref{log_likelihood} by gradient descent, by leveraging fisher's identity:
-$$
-	\nabla \log p_\theta(x_{0:T}, y_{0:T}, u_{0:T}) = \mathbb{E}_\theta \left[ \nabla\log p_\theta(x_{0:T}, y_{0:T}, u_{0:T}) | Y_{0:T} \right]
-$$
-In order to approximate this expectation, we need to sample from the posterior distribution $p_\theta(x|y)$.
+In order to approximate the expectation, we need to sample from the posterior distribution $p_\theta(x|y)$.
 In Section~\ref{sec:smc}, we detail a Sequential Monte Carlo approach to this end.
 In Section~\ref{sec:gradient_descent}, we describe the algorithm to train our model through gradient descent.
 
