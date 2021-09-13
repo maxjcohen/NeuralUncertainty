@@ -36,8 +36,8 @@ Our model can be viewed as a RNN layer followed by a fully connected layer. At t
 \begin{equation*}
 	\left\{
 	\begin{aligned}
-		y_{t+1} & = \tanh(W_y x_{t+1}^L + b_y)                        \\
-		x_{t+1} & = \tanh(W_{xx} x_{t} + W_{xu} \tilde u_{t+1} + b_x) \\
+		x_t & = W_{xx} x_{t-1} + W_{xu} \tilde u_t + b_x \\
+		y_t & = W_y x_t^L + b_y                        \\
 	\end{aligned}
 	\right.
 \end{equation*}
@@ -51,9 +51,9 @@ We can now write our model in terms of two functions $f$ and $g$ as:
 \begin{equation}
 	\left\{
 	\begin{aligned}
+		\tilde u_t & = h(u_t)                                       & \text{command model} \\
+		x_t    & = g_\theta(x_{t-1}, \tilde u_t) + \eta_{t+1} & \text{state model}       \\
 		y_t        & = f_\theta(x_t) + \epsilon_t                   & \text{observation model} \\
-		x_{t+1}    & = g_\theta(x_{t}, \tilde u_{t+1}) + \eta_{t+1} & \text{state model}       \\
-		\tilde u_t & = h(u_t)                                       & \text{command model}
 	\end{aligned}
 	\right.
 	\label{model_definition}
@@ -74,11 +74,11 @@ $$
 We can start by developing the joint log likelihood:
 
 \begin{align*}
-	\log p_{\theta}(X_{0:T}, y_{0:T}, u_{0:T}) & = \frac{1}{T} \log\left(p_\theta(x_0)p_\theta(y_0 | x_0)\prod_{k=1}^{T} p_{\theta}(x_k | x_{k-1}, u_k) p_{\theta}(y_k | x_k)\right) \\
+	\log p_{\theta}(x, y) & = \frac{1}{T} \log\left(p_\theta(x_0)p_\theta(y_0 | x_0)\prod_{k=1}^{T} p_{\theta}(x_k | x_{k-1}, u_k) p_{\theta}(y_k | x_k)\right) \\
 						   & = \frac{1}{T} \log p_\theta(x_0)                                                                                                    \\
 						   & + \frac{1}{T} \sum_{k=1}^{T} \log \; p_{\theta}(x_k | x_{k-1}, u_k) + \frac{1}{T} \sum_{k=0}^{T} \log \; p_{\theta}(y_k | x_k)      \\
 						   & = \frac{1}{T} \log p_\theta(x_0) -\frac{1}{2} \log|\Sigma_x| -\frac{1}{2} \log|\Sigma_y| + Cst                                      \\
-						   & - \frac{1}{2T} \sum_{k=1}^{T}(x_k - g_\theta(x_{k-1}, u_{k}))' \Sigma_x^{-1} (x_k - g_\theta(x_{k-1}, u_{k}))                       \\
+                                                   & - \frac{1}{2T} \sum_{k=1}^{T}(x_k - g_\theta(x_{k-1}, u_{k}))' \Sigma_x^{-1} (x_k - g_\theta(x_{k-1}, u_{k})) \\
 						   & - \frac{1}{2T} \sum_{k=0}^{T}(y_k - f_\theta(x_k))' \Sigma_y^{-1} (y_k - f_\theta(x_k))                                             \\
 \end{align*}
 
@@ -168,8 +168,8 @@ During the forward pass, we generate a set of $N$ particles under the law $p(x|y
 Considering that we have computed a set of $N$ trajectories $(\xi^i_{0:T}),\;1 \leq i \leq N$, associated with weights $(\omega^i)$, we can approximate the gradient of the log likelihood by computing the gradient of:
 \begin{align*}
 	\mathbb{J}(\theta) & = \log |\Sigma_x| + \log |\Sigma_y|                                                                                                        \\
-			   & + \frac{1}{T}\sum_{k=1}^T \sum_{i=1}^N \omega^i (y_k - f_\theta(\xi_k^i))' \Sigma_y^{-1} (y_k - f_\theta(\xi_k^i))                         \\
-			   & + \frac{1}{T}\sum_{k=0}^T \sum_{i=1}^N \omega^i (\xi_k^i - g_\theta(\xi_{k-1}^i, u_k))'\Sigma_x^{-1}(\xi_k^i - g_\theta(\xi_{k-1}^i, u_k))
+			   & + \frac{1}{T}\sum_{k=0}^T \sum_{i=1}^N \omega^i (y_k - f_\theta(\xi_k^i))' \Sigma_y^{-1} (y_k - f_\theta(\xi_k^i))                         \\
+                           & + \frac{1}{T}\sum_{k=1}^T \sum_{i=1}^N \omega^i (\xi_k^i - g_\theta(\xi_{k-1}^i, u_k))'\Sigma_x^{-1}(\xi_k^i - g_\theta(\xi_{k-1}^i, u_k))
 \end{align*}
 
 \subsection{Backward pass}
